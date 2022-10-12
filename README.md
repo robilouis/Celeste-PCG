@@ -16,8 +16,8 @@ Model generating content procedurally to create rooms
 ## Julia Encoder function
 Use the cskeleston, the room generator and the playability module to generate final levels
 #### Requirements
-- Level skeleton $L = \left{l_1, \ldots, l_n \right}$: set of empty rooms indexed by an integer $i$, their sizes $(h_i, w_i)$ and their spatial coordinates $(x_i, y_i)$ 
-- A set of generated rooms $R = \{r_1, \ldots, r_K\}$
+- Level skeleton $L = {l_1, \ldots, l_n }$: set of empty rooms indexed by an integer $i$, their sizes $(h_i, w_i)$ and their spatial coordinates $(x_i, y_i)$ 
+- A set of generated rooms $R = {r_1, \ldots, r_K}$
 - Playability module
 #### Procedure
 For each empty room $l_i$, we match a room $r_{\phi(i)}$ such that:
