@@ -21,6 +21,6 @@ Use the cskeleston, the room generator and the playability module to generate fi
 - Playability module
 #### Procedure
 For each empty room $l_i$, we match a room $r_\phi(i)$ such that:
-    - $r_\phi(i)$ has the right dimensions
-    - $r_\phi(i)$ is playable
-    - Exits somewhat match -> maybe post-processing, same for starting/ending room.
+- $r_\phi(i)$ has the right dimensions
+- $r_\phi(i)$ is playable
+- Exits somewhat match -> maybe post-processing, same for starting/ending room.
