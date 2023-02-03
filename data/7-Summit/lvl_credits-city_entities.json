@@ -1,0 +1,1 @@
+[{"__name":"jumpThru","id":0,"x":200,"width":24,"originX":0,"originY":0,"texture":"default","y":184},{"__name":"bird","mode":"FlyAway","id":1,"x":200,"originX":8,"originY":16,"y":128},{"__name":"player","id":2,"x":424,"width":8,"originX":4,"originY":8,"y":192}]

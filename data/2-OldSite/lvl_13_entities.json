@@ -1,0 +1,1 @@
+[{"__name":"player","id":0,"x":8,"width":8,"originX":4,"originY":8,"y":152},{"__name":"payphone","id":3,"x":256,"originX":8,"originY":48,"y":152},{"__children":[{"__name":"node","x":328,"y":83}],"__name":"wire","above":false,"id":4,"x":260,"originX":4,"originY":4,"y":104}]

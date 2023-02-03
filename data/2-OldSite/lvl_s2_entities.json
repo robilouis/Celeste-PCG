@@ -1,0 +1,1 @@
+[{"__name":"player","id":0,"x":112,"width":8,"originX":4,"originY":8,"y":160},{"__name":"blackGem","id":1,"x":224,"originX":6,"originY":6,"removeCameraTriggers":false,"y":112},{"__name":"hanginglamp","height":48,"id":2,"x":168,"originX":-2,"originY":0,"y":32}]

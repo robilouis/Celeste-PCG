@@ -1,0 +1,1 @@
+[{"__name":"player","id":0,"x":8,"width":8,"originX":4,"originY":8,"y":816},{"__name":"npc","npc":"theo_04_cliffside","id":1,"x":-8,"originX":8,"originY":16,"y":688},{"__children":[{"__name":"node","x":1200,"y":296}],"__name":"gondola","active":true,"id":3,"x":176,"originX":32,"originY":0,"y":816}]

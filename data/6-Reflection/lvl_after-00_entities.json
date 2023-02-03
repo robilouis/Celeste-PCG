@@ -1,0 +1,1 @@
+[{"__name":"player","id":454,"x":152,"width":8,"originX":4,"originY":8,"y":344},{"__name":"jumpThru","id":988,"x":200,"width":48,"originX":0,"originY":0,"texture":"default","y":400},{"__name":"jumpThru","id":1005,"x":56,"width":16,"originX":0,"originY":0,"texture":"default","y":192},{"__name":"checkpoint","id":1007,"x":168,"originX":4,"originY":8,"y":336}]

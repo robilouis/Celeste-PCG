@@ -1,0 +1,1 @@
+[{"__name":"player","id":0,"x":8,"width":8,"originX":4,"originY":8,"y":152},{"__name":"player","id":1,"x":312,"width":8,"originX":4,"originY":8,"y":144},{"__name":"bird","mode":"FlyAway","id":2,"x":232,"originX":8,"originY":16,"y":80},{"__name":"npc","npc":"granny_09_outside","id":4,"x":224,"originX":8,"originY":16,"y":144}]

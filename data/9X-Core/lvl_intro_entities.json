@@ -1,0 +1,1 @@
+[{"__children":[{"__name":"node","x":176,"y":128}],"__name":"heartGemDoor","height":96,"requires":23,"id":0,"x":176,"width":88,"originX":0,"originY":0,"y":88},{"__name":"player","id":1,"x":16,"width":8,"originX":4,"originY":8,"y":144},{"__name":"player","id":2,"x":312,"width":8,"originX":4,"originY":8,"y":104}]
