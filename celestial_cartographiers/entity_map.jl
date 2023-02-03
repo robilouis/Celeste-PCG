@@ -22,7 +22,9 @@ default_entity_map = Dict{Char, Union{Type, Function}}(
     'B' => Bumper,
 
     'R' => Refill,
-    'F' => Feather
+    'F' => Feather,
+
+    'L' => Lightbeam
 )
 
 
@@ -55,6 +57,8 @@ entity_offsets = Dict{Union{Type, Function}, Tuple{Integer, Integer}}(
     Spring => (8, 8),
     SpringLeft => (0, 8),
     SpringRight => (8, 8),
+
+    Lightbeam => (0, 0)
 )
 # Function => (searchWidth, searchHeight)
 search_for_size = Dict{Union{Type, Function}, Tuple{Bool, Bool}}(
@@ -87,6 +91,8 @@ search_for_size = Dict{Union{Type, Function}, Tuple{Bool, Bool}}(
     SpringRight => (false,  false),
 
     Bumper => (false, false),
+
+    Lightbeam => (false, false)
 )
 
 function searchSize(tiles::Array{Char, 2}, x::Integer, y::Integer, searchWidth::Bool=true, searchHeight::Bool=true)
