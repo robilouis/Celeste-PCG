@@ -1,5 +1,11 @@
 # seleCte Changelog
 
+# [0.0.7] DD.MM.2023
+
+* Worked on room size distribution
+    * Generated csv file with number of rooms per unique size
+    * Generated a few plots
+
 # [0.0.6] 19.09.2023
 
 * Updated organization of code for skeleton
