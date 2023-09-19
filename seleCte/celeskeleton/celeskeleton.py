@@ -79,6 +79,9 @@ class Room():
             for exit in self.exits[sides[k]]:
                 exit[0], exit[1] = exit[0] + delta[k%2], exit[1] + delta[k%2]
     
+    def set_exits(self, d_exits):
+        self.exits = d_exits
+
     def add_exit(self, side, c1, c2):
         if c1 >= c2:
             raise ValueError("Error: make sure coordinates are ordered and non equal")
@@ -348,3 +351,19 @@ def PCG_skeleton(nb_rooms, p=0.5):
     skeleton.set_start_end()
 
     return skeleton
+
+def json_to_skeleton(data_json):
+    """
+    Extracts data from json file and returns Cskeleton object
+    """
+    json_skeleton = Cskeleton()
+    for name in data_json:
+        w, h = data_json[name]["size"]
+        x, y = data_json[name]["origin"]
+        room = Room(width=w, height=h, origin_x=x, origin_y=y)
+        room.set_exits(data_json[name]["exits"])
+        json_skeleton.add_room(room, name)
+    
+    json_skeleton.set_start_end()
+    
+    return json_skeleton
