@@ -1,5 +1,11 @@
 # seleCte Changelog
 
+# [0.0.8] DD.09.2023
+
+* Basic draft of AI MdMC model
+* Made visual interface v1 using pandas styler
+* Recombination of fg + entities in a single structure to make it possible for the model to interpret it as a single object 
+
 # [0.0.7] 22.09.2023
 
 * Worked on room size distribution
