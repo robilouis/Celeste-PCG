@@ -1,10 +1,10 @@
 # seleCte Changelog
 
-# [0.0.8] DD.09.2023
+# [0.0.8] DD.MM.2023
 
 * Basic draft of AI MdMC model
 * Made visual interface v1 using pandas styler
-* Recombination of fg + entities in a single structure to make it possible for the model to interpret it as a single object 
+* Recombination of fg + entities in a single structure to make it possible for the model to interpret it as a single object + creation of those maps
 
 # [0.0.7] 22.09.2023
 
