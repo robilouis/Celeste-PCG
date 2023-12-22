@@ -19,6 +19,7 @@ class Room():
             "left":[],
             "right":[]
             }
+        self.data: np.array[object] = np.zeros((self.size[1], self.size[0]), dtype=str)
 
     def get_size(self):
         return self.size
@@ -30,7 +31,7 @@ class Room():
         return self.exits
     
     def description(self):
-        print(f"Bottom-left corner position: {self.origin}\nRoom size: {self.size}\nExits: {self.exits}")
+        print(f"Bottom-left corner position: {self.origin}\nRoom size: {self.size}\nExits: {self.exits}\nData: {self.data}")
 
     def get_tr_corner(self):
         """
@@ -81,6 +82,14 @@ class Room():
     
     def set_exits(self, d_exits):
         self.exits = d_exits
+    
+    def set_data(self, data):
+        if data.shape[0] == self.get_size()[1] and data.shape[1] == self.get_size()[0]:
+            self.data = data
+        else: # mismatch in the size - should raise an error
+            raise ValueError(
+                f"Can't assign data of shape {data.shape} to a room of shape {(self.get_size()[1], self.get_size()[0])}!"
+                )
 
     def add_exit(self, side, c1, c2):
         if c1 >= c2:
@@ -266,7 +275,7 @@ class Cskeleton():
         """
         Shows a super cool plot of the skeleton, underlining start and end if existing
         """
-        p = bokeh.plotting.figure()
+        p = bokeh.plotting.figure(match_aspect=True)
         for room in self.lvl:
             x, y = self.lvl[room].get_origin()
             w, h = self.lvl[room].get_size()
@@ -295,8 +304,8 @@ class Cskeleton():
             fn = f"skeleton_{len(self.lvl)}.png"
             export_png(p, filename=fn)
     
-    
-    def to_JSON(self, filename):
+
+    def save(self, lvl_name):
         """
         Exports all data contained in the skeleton in a readable JSON
         """
@@ -308,14 +317,15 @@ class Cskeleton():
                 "size": self.lvl[room].size,
                 "exits": self.lvl[room].exits,
             }
+            np.savetxt(f"./{lvl_name}/{room}.csv", self.lvl[room].data, fmt='%s')
         
-        with open(filename, 'w', encoding='utf-8') as f:
+        with open(f"./{lvl_name}/data.json", 'w', encoding='utf-8') as f:
             json.dump(json_skeleton, f, ensure_ascii=False, indent=4)
             f.close()
 
     
 
-def PCG_skeleton(nb_rooms, p=0.5):
+def PCG_skeleton(nb_rooms, p=0.5, size=None):
     """
     Generates procedurally a level skeleton made of nb_rooms rooms, 
     with a probability p of connecting the new room for each iteration, 
@@ -327,7 +337,10 @@ def PCG_skeleton(nb_rooms, p=0.5):
     """
     skeleton = Cskeleton()
 
-    size_init = [random.randint(10, 100) for _ in range(2)]
+    if size:
+        size_init=size
+    else:
+        size_init = [random.randint(10, 100) for _ in range(2)]
     room_init = Room(size_init[0], size_init[1])
     sides = ["up", "down", "left", "right"]
 
@@ -342,7 +355,10 @@ def PCG_skeleton(nb_rooms, p=0.5):
         while overlapping:
             last_room = skeleton.select_last_room(room_name, p)
             side = np.random.choice(sides)
-            room = Room(random.randint(10, 100), random.randint(10, 100))
+            if size:
+                room = Room(size[0], size[1])
+            else:
+                room = Room(random.randint(10, 100), random.randint(10, 100))
             room.connect(last_room, side, skeleton)
             overlapping = skeleton.is_overlapping_with(room)
         room_name = f"room_{k}"
