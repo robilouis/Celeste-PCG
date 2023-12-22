@@ -1,6 +1,11 @@
 # seleCte Changelog
 
-# [0.0.8] DD.MM.2023
+# [0.1.0] 22.12.2023
+
+* Extended notebook in pcg model to combine celeskeleton + room generation
+* Map encoding function made in Julia - next step is the exits handling
+
+# [0.0.8] 10.10.2023
 
 * Basic draft of AI MdMC model
 * Made visual interface v1 using pandas styler
