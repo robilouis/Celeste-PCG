@@ -1,5 +1,9 @@
 # seleCte Changelog
 
+# [0.1.1] 02.02.2024
+
+* Adapted the pcg model to handle the automated creation of borders and exits for each room
+
 # [0.1.0] 22.12.2023
 
 * Extended notebook in pcg model to combine celeskeleton + room generation

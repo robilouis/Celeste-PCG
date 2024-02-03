@@ -21,15 +21,19 @@ class Room():
             }
         self.data: np.array[object] = np.zeros((self.size[1], self.size[0]), dtype=str)
 
+
     def get_size(self):
         return self.size
     
+
     def get_origin(self):
         return self.origin
     
+
     def get_exits(self):
         return self.exits
     
+
     def description(self):
         print(f"Bottom-left corner position: {self.origin}\nRoom size: {self.size}\nExits: {self.exits}\nData: {self.data}")
 
@@ -39,12 +43,14 @@ class Room():
         """
         return [self.origin[0] + self.size[0], self.origin[1] + self.size[1]]
     
+
     def get_corners(self):
         """
         Returns coordinates of bottom left and top right corner [x1, y1, x2, y2]
         """
         return self.get_origin() + self.get_tr_corner()
     
+
     def clear_exits(self):
         """
         Clears exits dict
@@ -56,6 +62,7 @@ class Room():
             "right":[]
             }
     
+
     def set_size(self, w, h):
         """
         Setter to modify size of a room. Might interfer with exits positions so you can only change size of a room when there are no exits.
@@ -68,6 +75,7 @@ class Room():
             raise ValueError("Width and height have to be positive!")
         self.size = [w, h]
     
+
     def set_origin(self, x, y):
         """
         Setter to modify the origin point (bottom left corner) of a room. Takes into account exits and move them accordingly.
@@ -80,9 +88,11 @@ class Room():
             for exit in self.exits[sides[k]]:
                 exit[0], exit[1] = exit[0] + delta[k%2], exit[1] + delta[k%2]
     
+
     def set_exits(self, d_exits):
         self.exits = d_exits
     
+
     def set_data(self, data):
         if data.shape[0] == self.get_size()[1] and data.shape[1] == self.get_size()[0]:
             self.data = data
@@ -90,6 +100,7 @@ class Room():
             raise ValueError(
                 f"Can't assign data of shape {data.shape} to a room of shape {(self.get_size()[1], self.get_size()[0])}!"
                 )
+
 
     def add_exit(self, side, c1, c2):
         if c1 >= c2:
@@ -107,6 +118,7 @@ class Room():
             else:
                 raise ValueError(f"Exit out of bounds {(self.get_origin()[1] + 1, self.get_origin()[1] + self.get_size()[1] - 1)}!")
     
+
     def generate_exit(self, side, size):
         if side in ["up", "down"]:
             c = np.random.randint(self.get_origin()[0] + 1, self.get_origin()[0] + self.get_size()[0] - size)
@@ -117,6 +129,7 @@ class Room():
         else:
             raise ValueError(f"Error: Select a side among {list(self.exits.keys())}")
     
+
     def exits_to_list(self):
         """
         Returns the list of coordinates of the exits of the room as quadruplets (x0, y0, x1, y1)
@@ -145,6 +158,7 @@ class Room():
         else:
             return True
 
+
     def connect(self, room, side, skeleton):
         """
         Move self so that self is juxtaposed to room on the selected side
@@ -157,8 +171,8 @@ class Room():
             if not ovl:
                 x0_bis, y0_bis = self.get_origin()
                 range_min, range_max = max(x0, x0_bis), min(x0+room.get_size()[0], x0_bis+self.get_size()[0])
-                size = np.random.randint(1, range_max-range_min-1)
-                c = np.random.randint(range_min+1, range_max-size)
+                size = np.random.randint(2, range_max-range_min-1)
+                c = np.random.randint(range_min+1, range_max-size-1)
                 self.add_exit("down", c, c+size)
                 room.add_exit("up", c, c+size)
 
@@ -168,8 +182,8 @@ class Room():
             if not ovl:
                 x0_bis, y0_bis = self.get_origin()
                 range_min, range_max = max(x0, x0_bis), min(x0+room.get_size()[0], x0_bis+self.get_size()[0])
-                size = np.random.randint(1, range_max-range_min-1)
-                c = np.random.randint(range_min+1, range_max-size)
+                size = np.random.randint(2, range_max-range_min-1)
+                c = np.random.randint(range_min+1, range_max-size-1)
                 self.add_exit("up", c, c+size)
                 room.add_exit("down", c, c+size)
 
@@ -179,8 +193,8 @@ class Room():
             if not ovl:
                 x0_bis, y0_bis = self.get_origin()
                 range_min, range_max = max(y0, y0_bis), min(y0+room.get_size()[1], y0_bis+self.get_size()[1])
-                size = np.random.randint(1, range_max-range_min-1)
-                c = np.random.randint(range_min+1, range_max-size)
+                size = np.random.randint(2, range_max-range_min-1)
+                c = np.random.randint(range_min+1, range_max-size-1)
                 self.add_exit("left", c, c+size)
                 room.add_exit("right", c, c+size)
 
@@ -190,8 +204,8 @@ class Room():
             if not ovl:
                 x0_bis, y0_bis = self.get_origin()
                 range_min, range_max = max(y0, y0_bis), min(y0+room.get_size()[1], y0_bis+self.get_size()[1])
-                size = np.random.randint(1, range_max-range_min-1)
-                c = np.random.randint(range_min+1, range_max-size)
+                size = np.random.randint(2, range_max-range_min-1)
+                c = np.random.randint(range_min+1, range_max-size-1)
                 self.add_exit("right", c, c+size)
                 room.add_exit("left", c, c+size)
         else:
@@ -206,6 +220,10 @@ class Cskeleton():
         self.ending_room = None
     
 
+    def list_all_rooms(self):
+        return list(self.lvl.keys())
+
+
     def description(self):
         if not self.lvl:
             print(f"The skeleton object is empty!")
@@ -214,19 +232,23 @@ class Cskeleton():
             self.lvl[room].description()
             print("\n")
     
+
     def get_nb_rooms(self):
         return len(list(self.lvl.keys()))
     
+
     def add_room(self, room, name):
         if name in self.lvl.keys():
             raise ValueError(f"Room {name} already exists! Please use another name.")
         self.lvl[name] = room
     
+
     def remove_room(self, name):
         if name in self.lvl.keys():
             del self.lvl[name]
         else:
             raise ValueError(f"Room {name} does not exists!")
+
 
     def global_overlapping(self):
         nb_rooms = len(self.lvl)
@@ -237,6 +259,7 @@ class Cskeleton():
                 if self.lvl[l_names_rooms[i]].is_overlapping(self.lvl[l_names_rooms[j]]):
                     l_index_overlaps.append((l_names_rooms[i], l_names_rooms[j]))
         return l_index_overlaps
+    
 
     def is_overlapping_with(self, room):
         for name in self.lvl:
@@ -244,6 +267,7 @@ class Cskeleton():
                 return True
         return False
     
+
     def get_room_by_name(self, name):
         """
         Returns room by name, will modify the original obj even if different name
@@ -263,13 +287,15 @@ class Cskeleton():
         else:
             name = room_name
         return self.get_room_by_name(name)
-    
+
+
     def set_start_end(self):
         """
         Sets starting_room and ending_room attributes of a skeleton, comes handy later when generating playable level.
         """
         l_lvl_names = list(self.lvl.keys())
         self.starting_room, self.ending_room = l_lvl_names[0], l_lvl_names[-1]
+
 
     def show_skeleton(self, show_names=True, save=True):
         """
@@ -359,7 +385,10 @@ def PCG_skeleton(nb_rooms, p=0.5, size=None):
                 room = Room(size[0], size[1])
             else:
                 room = Room(random.randint(10, 100), random.randint(10, 100))
-            room.connect(last_room, side, skeleton)
+            try:
+                room.connect(last_room, side, skeleton)
+            except ValueError:
+                continue
             overlapping = skeleton.is_overlapping_with(room)
         room_name = f"room_{k}"
         skeleton.add_room(room, room_name)
@@ -367,6 +396,7 @@ def PCG_skeleton(nb_rooms, p=0.5, size=None):
     skeleton.set_start_end()
 
     return skeleton
+
 
 def json_to_skeleton(data_json):
     """
@@ -383,3 +413,48 @@ def json_to_skeleton(data_json):
     json_skeleton.set_start_end()
     
     return json_skeleton
+
+
+#### Functions to fill and format the rooms of a celeskeleton object
+
+def _create_full_borders_room(data, tile_id=1):
+    data[0, :] = tile_id
+    data[-1, :] = tile_id
+    data[:, 0] = tile_id
+    data[:, -1] = tile_id
+    return data
+
+
+def _create_exits(data, a, b, side, origin):
+    height = data.shape[0]
+    if side == "left":
+        x, y = height-(b-origin[1])-1, height-(a-origin[1])-1
+        data[x:y+1, 0] = 0
+    elif side == "right":
+        x, y = height-(b-origin[1])-1, height-(a-origin[1])-1
+        data[x:y+1, -1] = 0
+    elif side == "up":
+        x, y = a-origin[0], b-origin[0]
+        data[0, x:y+1] = 0
+    elif side == "down":
+        x, y = a-origin[0], b-origin[0]
+        data[-1, x:y+1] = 0
+    else:
+        return KeyError
+    return data
+
+
+def create_exits_in_matrix(room):
+    l_exits = ["left", "right", "up", "down"]
+    for exit in l_exits:
+        for a, b in room.exits[exit]:
+            room.data = _create_exits(room.data, a, b, side=exit, origin=room.get_origin())
+    
+    return room
+
+
+def format_filled_celeskeleton(skeleton):
+    for room_name in skeleton.list_all_rooms():
+        room = skeleton.get_room_by_name(room_name)
+        room.set_data(_create_full_borders_room(room.data))
+        room = create_exits_in_matrix(room)
