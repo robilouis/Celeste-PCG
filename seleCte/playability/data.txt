@@ -12,3 +12,5 @@ max_climb: (0, 15)
 jump + climb: (0, 18)
 
 max_climb_without_spikes: (0, inf) -> neutral jump
+
+A* with gravity
