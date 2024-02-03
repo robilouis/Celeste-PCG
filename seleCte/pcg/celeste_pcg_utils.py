@@ -4,8 +4,6 @@ import os
 import numpy as np
 import pandas as pd
 
-from IPython.display import display
-
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -82,12 +80,8 @@ def generate_new_tile(proba_dist, all_symbols=ALL_TILES_AND_ENTITIES, exclude=[]
     return new_tile
 
 
-def update_room_array(array, x, y, bt_depth=0, verbose=True):
+def update_room_array(array, x, y, d_proba_estimation, bt_depth=0, verbose=True):
     
-    with open("probability_estimation.json", "r") as f:
-        d_proba_estimation = json.load(f)
-        f.close()
-
     bt_depth_true = bt_depth_true = min(bt_depth, array.shape[1]-y-3)
     # if bt depth > 0, needs to apply backtracking
     # everytime you pick a symbol, add it to excluded - if cannot pick: random pick
@@ -130,21 +124,21 @@ def update_room_array(array, x, y, bt_depth=0, verbose=True):
     return array
 
 
-def generate_room(width=40, height=23, backtracking_depth=0, verbose=False):
+def generate_room(d_proba_estimation, width=40, height=23, backtracking_depth=0, verbose=False):
     room = generate_empty_room(width, height)
     
     for x in range(height-2):
         for y in range(width-2):
-            room = update_room_array(room, x, y, bt_depth=backtracking_depth, verbose=verbose)
+            room = update_room_array(room, x, y, d_proba_estimation, bt_depth=backtracking_depth, verbose=verbose)
     
     return room
 
 
-def generate_room_batch(n_rooms, path_folder_to_save, width=40, height=23, backtracking_depth=0, verbose=False):
+def generate_room_batch(n_rooms, path_folder_to_save, d_proba_estimation, width=40, height=23, backtracking_depth=0, verbose=False):
     if not os.path.exists(path_folder_to_save):
         os.mkdir(path_folder_to_save)
     for i in range(n_rooms):
-        room_temp = generate_room(width, height, backtracking_depth, verbose)
+        room_temp = generate_room(d_proba_estimation, width, height, backtracking_depth, verbose)
         pd.DataFrame(room_temp).to_csv(f"{path_folder_to_save}/room_{i}_generated_MdMC.csv", header=None, index=None, sep=";")
         logger.info(
             f"Successfully generated room {i}: saved to {path_folder_to_save}/room_{i}_generated_MdMC_{width}_{height}.csv"

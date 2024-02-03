@@ -3,6 +3,7 @@ import bokeh.plotting
 from bokeh.io import export_png
 from bokeh.models import ColumnDataSource
 import json
+import os
 import numpy as np
 import random
 
@@ -336,6 +337,7 @@ class Cskeleton():
         Exports all data contained in the skeleton in a readable JSON
         """
         json_skeleton = {}
+        os.makedirs(f"./seleCte/pcg/pcg_model_results/{lvl_name}/", exist_ok=True)
 
         for room in self.lvl:
             json_skeleton[room] = {
@@ -343,9 +345,9 @@ class Cskeleton():
                 "size": self.lvl[room].size,
                 "exits": self.lvl[room].exits,
             }
-            np.savetxt(f"./{lvl_name}/{room}.csv", self.lvl[room].data, fmt='%s')
+            np.savetxt(f"./seleCte/pcg/pcg_model_results/{lvl_name}/{room}.csv", self.lvl[room].data, fmt='%s')
         
-        with open(f"./{lvl_name}/data.json", 'w', encoding='utf-8') as f:
+        with open(f"./seleCte/pcg/pcg_model_results/{lvl_name}/data.json", 'w', encoding='utf-8') as f:
             json.dump(json_skeleton, f, ensure_ascii=False, indent=4)
             f.close()
 
