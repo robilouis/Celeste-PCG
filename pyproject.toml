@@ -1,0 +1,10 @@
+[project]
+name = "Celeste-PCG"
+version = "0.1.1"
+description = "Celeste Master Thesis by robilouis"
+requires-python = ">= 3.11"
+authors = [
+    {name = "Louis Robinet", email = "louisrobi@hotmail.fr"},
+]
+readme = "README.md"
+license = {file = "LICENSE"}
