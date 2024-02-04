@@ -1,15 +1,12 @@
-using Pkg
-using Maple
+using CSV
+using DataFrames
 using DelimitedFiles
+using JSON
+using Maple
 
-# level_encoder function is the final step, meaning the room_set input
-# needs to fulfill all requirements mentioned throughout the project
-
-function level_encoder(level_title, room_set, output_filename)
-    level = Map(
-        level_title,
-        room_set
-    )
-
-    encodeMap(level, output_filename)
+d_metadata_lvl = Dict()
+open("../pcg/pcg_model_results/$lvl_name/data.json", "r") do f
+    global d_metadata_lvl
+    dicttxt = read(f, String)  # file information to string
+    d_metadata_lvl = JSON.parse(dicttxt)  # parse and transform data
 end

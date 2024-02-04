@@ -1,9 +1,10 @@
 # seleCte Changelog
 
-# [0.1.1] 02.02.2024
+# [0.2.0] 02.02.2024
 
 * Adapted the pcg model to handle the automated creation of borders and exits for each room
 * Massive reorganization of the code
+* Building pipeline part between celeskeleton and room encoder
 
 # [0.1.0] 22.12.2023
 

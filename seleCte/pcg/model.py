@@ -26,6 +26,11 @@ def main(args):
         btd = args.bt_depth
     else:
         btd = 0
+    
+    if args.level_name:
+        lvl_name = args.level_name
+    else:
+        lvl_name = "default_generated_level"
 
     pcg_gen_lvl = celeskeleton.PCG_skeleton(args.nb_rooms, args.proba, rs)
 
@@ -35,7 +40,7 @@ def main(args):
 
     celeskeleton.format_filled_celeskeleton(pcg_gen_lvl)
 
-    pcg_gen_lvl.save("test_model_py")
+    pcg_gen_lvl.save(f"{lvl_name}")
 
 
 if __name__ == "__main__":
@@ -64,6 +69,13 @@ if __name__ == "__main__":
         required=False,
         type=int,
         help="Depth of backtracking used in the room generation function",
+    )
+    parser.add_argument(
+        "--level-name",
+        "-ln",
+        required=False,
+        type=int,
+        help="Name of the folder where generated files will be stored",
     )
     args = parser.parse_args()
 
