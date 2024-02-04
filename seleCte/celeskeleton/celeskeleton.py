@@ -5,6 +5,7 @@ from bokeh.models import ColumnDataSource
 import json
 import os
 import numpy as np
+import pandas as pd
 import random
 
 
@@ -481,6 +482,17 @@ def json_to_skeleton(data_json):
 
     return json_skeleton
 
+
+def load_data_to_celeskeleton(folder_path):
+    with open(os.path.join(folder_path, "data.json"), "r") as f:
+        json_file = json.load(f)
+        f.close()
+    skel = json_to_skeleton(json_file)
+    for i in range(len(skel.list_all_rooms())):
+        temp_data = pd.read_csv(os.path.join(folder_path, f"room_{i+1}.csv"), header=None, sep=" ", dtype=str).to_numpy()
+        skel.get_room_by_name(f"room_{i+1}").set_data(temp_data)
+    
+    return skel
 
 #### Functions to fill and format the rooms of a celeskeleton object
 

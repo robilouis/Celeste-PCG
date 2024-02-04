@@ -1,5 +1,11 @@
 # seleCte Changelog
 
+# [0.2.1] DD.02.2024
+
+* Implementation of A-star like algo and integration in the PCG generation for the sake of playability
+* Fusion of both `celeste_pcg_utils.py` and `celeste_playability_utils.py` into a single `utils.py` file
+* Development of functions useful for future measures and benchmarking the playability threshold 
+
 # [0.2.0] 02.02.2024
 
 * Adapted the pcg model to handle the automated creation of borders and exits for each room

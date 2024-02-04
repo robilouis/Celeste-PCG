@@ -54,7 +54,7 @@ def color_map(val):
 
 def visualize_room(array):
     df_visu = pd.DataFrame(array)
-    df_visu = df_visu.style.applymap(color_map)
+    df_visu = df_visu.style.map(color_map)
     return df_visu
 
 
