@@ -26,7 +26,7 @@ def main(args):
         btd = args.bt_depth
     else:
         btd = 0
-    
+
     if args.level_name:
         lvl_name = args.level_name
     else:
