@@ -36,7 +36,6 @@
     * Added a few functions to deal with interface skeleton/JSON
     * Minor fixes to `Room` and `Cskeleton` classes
 * Slowly adapt from notebooks to Julia scripts
-* Added `utils.py` to add potential useful generic functions
 
 # [0.0.5] 07.03.2023
 
