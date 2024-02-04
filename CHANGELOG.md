@@ -1,6 +1,6 @@
 # seleCte Changelog
 
-# [0.2.1] DD.02.2024
+# [0.3.0] DD.02.2024
 
 * Implementation of A-star like algo and integration in the PCG generation for the sake of playability
 * Fusion of both `celeste_pcg_utils.py` and `celeste_playability_utils.py` into a single `utils.py` file
