@@ -48,9 +48,9 @@ def main(args):
             logger.error(
                 f"GENERATION FAILED - A* algo did not succeed for room {room_nb}"
             )
-        logger.info(f"Generated room {room_nb} in {nb_tries}.")
+        logger.info(f"Generated room {room_nb} in {nb_tries} iterations.")
 
-    celeskeleton.format_filled_celeskeleton(pcg_gen_lvl)
+    pcg_gen_lvl.format_filled_celeskeleton()
     logger.info("Celeskeleton object has been correcly formatted.")
 
     pcg_gen_lvl.save(f"{lvl_name}")
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         "--level-name",
         "-ln",
         required=False,
-        type=int,
+        type=str,
         help="Name of the folder where generated files will be stored",
     )
     args = parser.parse_args()

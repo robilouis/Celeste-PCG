@@ -307,7 +307,8 @@ class Room:
             ):  # make sure all exits are reachable
                 room_path = utils.astar(room_astar_ready, pt1, pt2)
                 if not room_path:
-                    logger.warning("A* room playability failed in current room")
+                    if verbose:
+                        logger.warning("A* room playability failed in current room")
                     return False
         if verbose:
             logger.info("Playability check succeeded - current room seems playable!")
