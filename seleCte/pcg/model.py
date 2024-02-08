@@ -3,7 +3,7 @@ import json
 import logging
 
 import seleCte.celeskeleton.celeskeleton as celeskeleton
-import seleCte.pcg.celeste_pcg_utils as utils
+import seleCte.utils as utils
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
