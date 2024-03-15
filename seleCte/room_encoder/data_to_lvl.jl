@@ -17,7 +17,7 @@ function create_room(room_nb, d_metadata, lvl_data_folder)
     Room(
         name="room_$room_nb",
         fgTiles=fgTiles,
-        position=(origin[1] * 8, origin[2] * 8),
+        position=(origin[1] * 8, origin[2] * -8),
         size=size(fgTiles),
         entities=entityMap(data)
     )

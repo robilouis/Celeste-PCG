@@ -74,7 +74,7 @@ if __name__ == "__main__":
         "--level-name",
         "-ln",
         required=False,
-        type=int,
+        type=str,
         help="Name of the folder where generated files will be stored",
     )
     args = parser.parse_args()
