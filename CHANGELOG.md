@@ -1,5 +1,11 @@
 # seleCte Changelog
 
+# [0.3.0] 06.04.2024
+
+* Implementation of A-star like algo and integration in the PCG generation for the sake of playability
+* Fusion of both `celeste_pcg_utils.py` and `celeste_playability_utils.py` into a single `utils.py` file
+* Pipeline to create a level based on CLI: from parameters to binary file
+
 # [0.2.0] 02.02.2024
 
 * Adapted the pcg model to handle the automated creation of borders and exits for each room
@@ -30,7 +36,6 @@
     * Added a few functions to deal with interface skeleton/JSON
     * Minor fixes to `Room` and `Cskeleton` classes
 * Slowly adapt from notebooks to Julia scripts
-* Added `utils.py` to add potential useful generic functions
 
 # [0.0.5] 07.03.2023
 

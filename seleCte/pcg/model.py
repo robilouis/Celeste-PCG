@@ -3,7 +3,7 @@ import json
 import logging
 
 import seleCte.celeskeleton.celeskeleton as celeskeleton
-import seleCte.pcg.celeste_pcg_utils as utils
+import seleCte.utils as utils
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -35,10 +35,23 @@ def main(args):
     pcg_gen_lvl = celeskeleton.PCG_skeleton(args.nb_rooms, args.proba, rs)
 
     for room_nb in range(1, args.nb_rooms + 1):
-        temp_data = utils.generate_room(d_proba_estimation, backtracking_depth=btd)
-        pcg_gen_lvl.get_room_by_name(f"room_{room_nb}").set_data(temp_data)
+        playable = False
+        nb_tries = 0
+        while not playable and nb_tries < 10:
+            nb_tries += 1
+            temp_data = utils.generate_room(d_proba_estimation, backtracking_depth=btd)
+            pcg_gen_lvl.get_room_by_name(f"room_{room_nb}").set_data(temp_data)
+            playable = pcg_gen_lvl.get_room_by_name(
+                f"room_{room_nb}"
+            ).is_playable_room()
+        if not playable:
+            logger.error(
+                f"GENERATION FAILED - A* algo did not succeed for room {room_nb}"
+            )
+        logger.info(f"Generated room {room_nb} in {nb_tries} iterations.")
 
-    celeskeleton.format_filled_celeskeleton(pcg_gen_lvl)
+    pcg_gen_lvl.format_filled_celeskeleton()
+    logger.info("Celeskeleton object has been correcly formatted.")
 
     pcg_gen_lvl.save(f"{lvl_name}")
 

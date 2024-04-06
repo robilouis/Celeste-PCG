@@ -1,8 +1,6 @@
-def playability_assessment(room_data):
-    """
-    Assesses if a room is playable. That is, determines if a room can be cleared by a player.
-    Input: room data (format to precise later)
-    Output: boolean, True if room clearable, False if not
-    """
+import seleCte.celeskeleton.celeskeleton as celeskeleton
 
-    return True
+lvl_skel = celeskeleton.load_data_to_celeskeleton(
+    "../pcg/pcg_model_results/default_generated_level"
+)
+lvl_skel.is_playable()

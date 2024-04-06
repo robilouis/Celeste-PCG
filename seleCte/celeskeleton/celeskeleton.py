@@ -2,10 +2,18 @@ import bokeh
 import bokeh.plotting
 from bokeh.io import export_png
 from bokeh.models import ColumnDataSource
+import itertools
 import json
+import logging
 import os
 import numpy as np
+import pandas as pd
 import random
+
+import seleCte.utils as utils
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 class Room:
@@ -241,6 +249,73 @@ class Room:
         else:
             raise ValueError("Selected side incorrect")
 
+    def get_starting_ending_points(self):
+        l_points = []
+        for exit in self.exits["up"]:
+            l_points.append((0, int(np.mean(exit)) - self.origin[0]))
+        for exit in self.exits["down"]:
+            l_points.append((self.size[1] - 1, int(np.mean(exit)) - self.origin[0]))
+        for exit in self.exits["left"]:
+            l_points.append((self.origin[1] - int(np.mean(exit)) + self.size[1], 0))
+        for exit in self.exits["right"]:
+            l_points.append(
+                (self.origin[1] - int(np.mean(exit)) + self.size[1], self.size[0] - 1)
+            )
+
+        return l_points
+
+    def extract_astar_ready_data(self):
+        rdy_data = pd.DataFrame(self.data)
+        rdy_data = rdy_data.map(lambda x: "0" if x == "L" else x)
+        rdy_data = rdy_data.map(lambda x: "0" if x == "D" else x)
+        rdy_data = rdy_data.map(lambda x: "1" if x != "0" else x)
+        rdy_data = rdy_data.to_numpy(dtype=int)
+        return rdy_data
+
+    def create_exits_in_matrix(self):
+        def _create_exits(data, a, b, side, origin):
+            height = data.shape[0]
+            if side == "left":
+                x, y = height - (b - origin[1]) - 1, height - (a - origin[1]) - 1
+                data[x : y + 1, 0] = 0
+            elif side == "right":
+                x, y = height - (b - origin[1]) - 1, height - (a - origin[1]) - 1
+                data[x : y + 1, -1] = 0
+            elif side == "up":
+                x, y = a - origin[0], b - origin[0]
+                data[0, x : y + 1] = 0
+            elif side == "down":
+                x, y = a - origin[0], b - origin[0]
+                data[-1, x : y + 1] = 0
+            else:
+                return KeyError
+            return data
+
+        l_exits = ["left", "right", "up", "down"]
+        for exit in l_exits:
+            for a, b in self.exits[exit]:
+                self.data = _create_exits(
+                    self.data, a, b, side=exit, origin=self.get_origin()
+                )
+
+    def is_playable_room(self, return_path=False, verbose=False):
+        room_exits_points = self.get_starting_ending_points()
+        room_astar_ready = self.extract_astar_ready_data()
+        if len(room_exits_points) > 1:  # not a dead end or a starting/ending room
+            for pt1, pt2 in itertools.combinations(
+                room_exits_points, 2
+            ):  # make sure all exits are reachable
+                room_path = utils.astar(room_astar_ready, pt1, pt2)
+                if not room_path:
+                    if verbose:
+                        logger.warning("A* room playability failed in current room")
+                    return False
+        if verbose:
+            logger.info("Playability check succeeded - current room seems playable!")
+        if return_path:
+            return room_path
+        return True
+
 
 class Cskeleton:
 
@@ -417,6 +492,46 @@ class Cskeleton:
             json.dump(json_skeleton, f, ensure_ascii=False, indent=4)
             f.close()
 
+        logger.info(
+            f"Saved lvl data in folder ./seleCte/pcg/pcg_model_results/{lvl_name}"
+        )
+
+    def format_filled_celeskeleton(self):
+        def _create_full_borders_room(data, tile_id=1):
+            data[0, :] = tile_id
+            data[-1, :] = tile_id
+            data[:, 0] = tile_id
+            data[:, -1] = tile_id
+
+            return data
+
+        for room_name in self.list_all_rooms():
+            room = self.get_room_by_name(room_name)
+            room.set_data(_create_full_borders_room(room.data))
+            room = room.create_exits_in_matrix()
+
+    # TODO: adapt to 1-exit rooms for space assertion once the strawberry spawner is done
+    def is_playable(self, return_paths=False):
+        l_paths = []
+        for i in range(len(self.list_all_rooms())):
+            temp_room = self.get_room_by_name(f"room_{i+1}")
+            temp_exits_points = temp_room.get_starting_ending_points()
+            temp_map = temp_room.extract_astar_ready_data()
+            if len(temp_exits_points) > 1:  # not a dead end or a starting/ending room
+                for pt1, pt2 in itertools.combinations(
+                    temp_exits_points, 2
+                ):  # make sure all exits are reachable
+                    temp_path = utils.astar(temp_map, pt1, pt2)
+                    l_paths.append((f"room_{i+1}", temp_path))
+                    if not temp_path:
+                        logger.warning(f"A* room playability failed in room {i+1}")
+                        return False
+
+        logger.info("Playability check succeeded!")
+        if return_paths:
+            return l_paths
+        return True
+
 
 def PCG_skeleton(nb_rooms, p=0.5, size=None):
     """
@@ -482,49 +597,18 @@ def json_to_skeleton(data_json):
     return json_skeleton
 
 
-#### Functions to fill and format the rooms of a celeskeleton object
+def load_data_to_celeskeleton(folder_path):
+    with open(os.path.join(folder_path, "data.json")) as f:
+        json_file = json.load(f)
+        f.close()
+    skel = json_to_skeleton(json_file)
+    for i in range(len(skel.list_all_rooms())):
+        temp_data = pd.read_csv(
+            os.path.join(folder_path, f"room_{i+1}.csv"),
+            header=None,
+            sep=" ",
+            dtype=str,
+        ).to_numpy()
+        skel.get_room_by_name(f"room_{i+1}").set_data(temp_data)
 
-
-def _create_full_borders_room(data, tile_id=1):
-    data[0, :] = tile_id
-    data[-1, :] = tile_id
-    data[:, 0] = tile_id
-    data[:, -1] = tile_id
-    return data
-
-
-def _create_exits(data, a, b, side, origin):
-    height = data.shape[0]
-    if side == "left":
-        x, y = height - (b - origin[1]) - 1, height - (a - origin[1]) - 1
-        data[x : y + 1, 0] = 0
-    elif side == "right":
-        x, y = height - (b - origin[1]) - 1, height - (a - origin[1]) - 1
-        data[x : y + 1, -1] = 0
-    elif side == "up":
-        x, y = a - origin[0], b - origin[0]
-        data[0, x : y + 1] = 0
-    elif side == "down":
-        x, y = a - origin[0], b - origin[0]
-        data[-1, x : y + 1] = 0
-    else:
-        return KeyError
-    return data
-
-
-def create_exits_in_matrix(room):
-    l_exits = ["left", "right", "up", "down"]
-    for exit in l_exits:
-        for a, b in room.exits[exit]:
-            room.data = _create_exits(
-                room.data, a, b, side=exit, origin=room.get_origin()
-            )
-
-    return room
-
-
-def format_filled_celeskeleton(skeleton):
-    for room_name in skeleton.list_all_rooms():
-        room = skeleton.get_room_by_name(room_name)
-        room.set_data(_create_full_borders_room(room.data))
-        room = create_exits_in_matrix(room)
+    return skel
