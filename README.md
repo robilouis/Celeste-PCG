@@ -31,7 +31,9 @@ Model assessing the clearability of a room, based on a tweaked version of the A*
 Model generating content procedurally to create rooms
 
 #### Misc
-Script for formatting `bash -c 'pyupgrade --py311-plus $(find **/*.py) && black . && ruff . --fix '`
+Script for formatting: `bash -c 'pyupgrade --py311-plus $(find **/*.py) && black . && ruff . --fix '`
+Install updated versions of Maple: `Pkg.add(PackageSpec(url="https://github.com/CelestialCartographers/Maple.git"))`
+
 
 # TODOs:
 - Add small functions for designing beginning/respawn/ending points of a generated level (check if heart is already implemented in Maple)
