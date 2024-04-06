@@ -383,5 +383,34 @@ def astar(maze, start, end, allow_diagonal_movement=True, verbose=False):
     return None
 
 
-def evaluate_astar_path(room, path):
+def evaluate_astar_path(room, path):  # TODO
+    raise NotImplementedError
+
+
+def evaluate_room_complexity(room):
+    raise NotImplementedError
+
+
+def evaluate_room_interestingness(room):
+    raise NotImplementedError
+
+
+def add_starting_point(room):
+    '''
+    Add structure with player spawn point in the starting room
+    '''
+    raise NotImplementedError
+
+
+def add_ending_point(room):
+    '''
+    Add structure with flag/heart/ending point in the final room
+    '''
+    raise NotImplementedError
+
+
+def add_respawn_points(room):
+    '''
+    Add player entities near entries to enable room access
+    '''
     raise NotImplementedError

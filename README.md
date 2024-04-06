@@ -32,3 +32,9 @@ Model generating content procedurally to create rooms
 
 #### Misc
 Script for formatting `bash -c 'pyupgrade --py311-plus $(find **/*.py) && black . && ruff . --fix '`
+
+# TODOs:
+- Add small functions for designing beginning/respawn/ending points of a generated level (check if heart is already implemented in Maple)
+- Add parameters to orient generation direction of a lvl: if None, should be like a random generation as it is atm. Should provide a direction (out of 8) and a "strength" parameter, from 0 to 1; 0 meaning the direction is basically ignored, 1 is like strictly respected (should be strictly between 0 and 1).
+- Revision of the base pcg model, we do not want to generate fully closed rooms, or at least give the possibility not to do so
+- Focus on playability, interestingness and complexity
