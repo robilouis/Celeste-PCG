@@ -1,1 +1,334 @@
-[{"__name":"player","id":0,"x":8,"width":8,"originX":4,"originY":8,"y":328},{"__children":[{"__name":"node","x":112,"y":312}],"__name":"zipMover","height":24,"id":1,"x":40,"width":24,"originX":0,"originY":0,"y":312},{"__children":[{"__name":"node","x":272,"y":216}],"__name":"zipMover","height":24,"id":2,"x":288,"width":24,"originX":0,"originY":0,"y":280},{"__name":"spikesUp","id":3,"x":208,"width":8,"originX":0,"originY":4,"type":"default","y":176},{"__name":"spikesRight","height":24,"id":4,"x":216,"originX":0,"originY":0,"type":"default","y":176},{"__name":"spikesLeft","height":24,"id":5,"x":208,"originX":4,"originY":0,"type":"default","y":176},{"__name":"spikesDown","id":6,"x":208,"width":8,"originX":0,"originY":0,"type":"default","y":200},{"__name":"spikesLeft","height":32,"id":7,"x":280,"originX":4,"originY":0,"type":"default","y":184},{"__name":"spikesUp","id":8,"x":280,"width":32,"originX":0,"originY":4,"type":"default","y":184},{"__children":[{"__name":"node","x":120,"y":136}],"__name":"zipMover","height":24,"id":9,"x":120,"width":24,"originX":0,"originY":0,"y":184},{"__name":"spikesUp","id":10,"x":120,"width":24,"originX":0,"originY":4,"type":"default","y":184},{"__name":"spikesUp","id":12,"x":160,"width":8,"originX":0,"originY":4,"type":"default","y":64},{"__name":"spikesDown","id":13,"x":160,"width":16,"originX":0,"originY":0,"type":"default","y":80},{"__name":"spikesRight","height":8,"id":14,"x":176,"originX":0,"originY":0,"type":"default","y":72},{"__name":"spikesUp","id":23,"x":168,"width":8,"originX":0,"originY":4,"type":"default","y":144},{"__name":"spikesRight","height":24,"id":24,"x":176,"originX":0,"originY":0,"type":"default","y":144},{"__name":"spikesLeft","height":24,"id":25,"x":168,"originX":4,"originY":0,"type":"default","y":144},{"__name":"spikesDown","id":26,"x":168,"width":8,"originX":0,"originY":0,"type":"default","y":168},{"__name":"spikesRight","height":112,"id":27,"x":16,"originX":0,"originY":0,"type":"default","y":168},{"__name":"spikesUp","id":28,"x":288,"width":24,"originX":0,"originY":4,"type":"default","y":280},{"__children":[{"__name":"node","x":280,"y":200}],"__name":"wire","above":true,"id":29,"x":16,"originX":4,"originY":4,"y":240},{"__children":[{"__name":"node","x":280,"y":208}],"__name":"wire","above":true,"id":30,"x":16,"originX":4,"originY":4,"y":216},{"__children":[{"__name":"node","x":168,"y":32}],"__name":"wire","above":true,"id":31,"x":112,"originX":4,"originY":4,"y":24},{"__children":[{"__name":"node","x":112,"y":48}],"__name":"wire","above":true,"id":32,"x":168,"originX":4,"originY":4,"y":32},{"__children":[{"__name":"node","x":160,"y":72}],"__name":"wire","above":true,"id":34,"x":104,"originX":4,"originY":4,"y":88},{"__children":[{"__name":"node","x":96,"y":88}],"__name":"wire","above":true,"id":35,"x":72,"originX":4,"originY":4,"y":80},{"__children":[{"__name":"node","x":96,"y":24}],"__name":"wire","above":true,"id":36,"x":72,"originX":4,"originY":4,"y":40}]
+[
+    {
+        "__name": "player",
+        "id": 0,
+        "x": 8,
+        "width": 8,
+        "originX": 4,
+        "originY": 8,
+        "y": 328
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 112,
+                "y": 312
+            }
+        ],
+        "__name": "zipMover",
+        "height": 24,
+        "id": 1,
+        "x": 40,
+        "width": 24,
+        "originX": 0,
+        "originY": 0,
+        "y": 312
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 272,
+                "y": 216
+            }
+        ],
+        "__name": "zipMover",
+        "height": 24,
+        "id": 2,
+        "x": 288,
+        "width": 24,
+        "originX": 0,
+        "originY": 0,
+        "y": 280
+    },
+    {
+        "__name": "spikesUp",
+        "id": 3,
+        "x": 208,
+        "width": 8,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 176
+    },
+    {
+        "__name": "spikesRight",
+        "height": 24,
+        "id": 4,
+        "x": 216,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 176
+    },
+    {
+        "__name": "spikesLeft",
+        "height": 24,
+        "id": 5,
+        "x": 208,
+        "originX": 4,
+        "originY": 0,
+        "type": "default",
+        "y": 176
+    },
+    {
+        "__name": "spikesDown",
+        "id": 6,
+        "x": 208,
+        "width": 8,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 200
+    },
+    {
+        "__name": "spikesLeft",
+        "height": 32,
+        "id": 7,
+        "x": 280,
+        "originX": 4,
+        "originY": 0,
+        "type": "default",
+        "y": 184
+    },
+    {
+        "__name": "spikesUp",
+        "id": 8,
+        "x": 280,
+        "width": 32,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 184
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 120,
+                "y": 136
+            }
+        ],
+        "__name": "zipMover",
+        "height": 24,
+        "id": 9,
+        "x": 120,
+        "width": 24,
+        "originX": 0,
+        "originY": 0,
+        "y": 184
+    },
+    {
+        "__name": "spikesUp",
+        "id": 10,
+        "x": 120,
+        "width": 24,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 184
+    },
+    {
+        "__name": "spikesUp",
+        "id": 12,
+        "x": 160,
+        "width": 8,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 64
+    },
+    {
+        "__name": "spikesDown",
+        "id": 13,
+        "x": 160,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 80
+    },
+    {
+        "__name": "spikesRight",
+        "height": 8,
+        "id": 14,
+        "x": 176,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 72
+    },
+    {
+        "__name": "spikesUp",
+        "id": 23,
+        "x": 168,
+        "width": 8,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 144
+    },
+    {
+        "__name": "spikesRight",
+        "height": 24,
+        "id": 24,
+        "x": 176,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 144
+    },
+    {
+        "__name": "spikesLeft",
+        "height": 24,
+        "id": 25,
+        "x": 168,
+        "originX": 4,
+        "originY": 0,
+        "type": "default",
+        "y": 144
+    },
+    {
+        "__name": "spikesDown",
+        "id": 26,
+        "x": 168,
+        "width": 8,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 168
+    },
+    {
+        "__name": "spikesRight",
+        "height": 112,
+        "id": 27,
+        "x": 16,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 168
+    },
+    {
+        "__name": "spikesUp",
+        "id": 28,
+        "x": 288,
+        "width": 24,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 280
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 280,
+                "y": 200
+            }
+        ],
+        "__name": "wire",
+        "above": true,
+        "id": 29,
+        "x": 16,
+        "originX": 4,
+        "originY": 4,
+        "y": 240
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 280,
+                "y": 208
+            }
+        ],
+        "__name": "wire",
+        "above": true,
+        "id": 30,
+        "x": 16,
+        "originX": 4,
+        "originY": 4,
+        "y": 216
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 168,
+                "y": 32
+            }
+        ],
+        "__name": "wire",
+        "above": true,
+        "id": 31,
+        "x": 112,
+        "originX": 4,
+        "originY": 4,
+        "y": 24
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 112,
+                "y": 48
+            }
+        ],
+        "__name": "wire",
+        "above": true,
+        "id": 32,
+        "x": 168,
+        "originX": 4,
+        "originY": 4,
+        "y": 32
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 160,
+                "y": 72
+            }
+        ],
+        "__name": "wire",
+        "above": true,
+        "id": 34,
+        "x": 104,
+        "originX": 4,
+        "originY": 4,
+        "y": 88
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 96,
+                "y": 88
+            }
+        ],
+        "__name": "wire",
+        "above": true,
+        "id": 35,
+        "x": 72,
+        "originX": 4,
+        "originY": 4,
+        "y": 80
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 96,
+                "y": 24
+            }
+        ],
+        "__name": "wire",
+        "above": true,
+        "id": 36,
+        "x": 72,
+        "originX": 4,
+        "originY": 4,
+        "y": 40
+    }
+]

@@ -1,1 +1,371 @@
-[{"__name":"player","id":0,"x":8,"originX":4,"originY":8,"y":696},{"__children":[{"__name":"node","x":80,"y":648}],"__name":"zipMover","height":24,"id":1,"x":16,"width":16,"originX":0,"originY":0,"y":648},{"__name":"spikesUp","id":2,"x":16,"width":16,"originX":0,"originY":4,"y":648},{"__name":"jumpThru","id":3,"x":24,"width":24,"originX":0,"originY":0,"y":696},{"__children":[{"__name":"node","x":288,"y":616}],"__name":"zipMover","height":24,"id":4,"x":288,"width":16,"originX":0,"originY":0,"y":672},{"__name":"spikesRight","height":352,"id":5,"x":8,"originX":0,"originY":0,"y":168},{"__name":"spikesLeft","height":552,"id":6,"x":312,"originX":4,"originY":0,"y":168},{"__name":"spikesUp","id":7,"x":288,"width":16,"originX":0,"originY":4,"y":672},{"__name":"spikesDown","id":8,"x":288,"width":16,"originX":0,"originY":0,"y":696},{"__children":[{"__name":"node","x":16,"y":552}],"__name":"zipMover","height":16,"id":10,"x":168,"width":16,"originX":0,"originY":0,"y":552},{"__name":"spikesUp","id":11,"x":168,"width":16,"originX":0,"originY":4,"y":552},{"__name":"spikesDown","id":12,"x":168,"width":16,"originX":0,"originY":0,"y":568},{"__name":"spikesDown","id":13,"x":16,"width":16,"originX":0,"originY":0,"y":672},{"__name":"crumbleBlock","id":14,"x":80,"width":8,"originX":0,"originY":0,"y":592},{"__children":[{"__name":"node","x":16,"y":496}],"__name":"zipMover","height":16,"id":15,"x":144,"width":16,"originX":0,"originY":0,"y":496},{"__name":"spikesUp","id":16,"x":144,"width":16,"originX":0,"originY":4,"y":496},{"__name":"spikesDown","id":17,"x":144,"width":16,"originX":0,"originY":0,"y":512},{"__name":"refill","id":18,"x":56,"originX":4,"originY":4,"y":480},{"__name":"spikesUp","id":19,"x":8,"width":80,"originX":0,"originY":4,"y":528},{"__name":"spikesRight","height":56,"id":20,"x":8,"originX":0,"originY":0,"y":544},{"__name":"spikesRight","height":48,"id":21,"x":8,"originX":0,"originY":0,"y":624},{"__name":"spikesUp","id":22,"x":8,"width":104,"originX":0,"originY":4,"y":608},{"__name":"crumbleBlock","id":25,"x":72,"width":8,"originX":0,"originY":0,"y":448},{"__name":"crumbleBlock","id":26,"x":152,"width":8,"originX":0,"originY":0,"y":424},{"__name":"crumbleBlock","id":27,"x":232,"width":8,"originX":0,"originY":0,"y":400},{"__children":[{"__name":"node","x":208,"y":344}],"__name":"zipMover","height":24,"id":28,"x":272,"width":16,"originX":0,"originY":0,"y":360},{"__name":"spikesUp","id":29,"x":272,"width":16,"originX":0,"originY":4,"y":360},{"__name":"spikesDown","id":30,"x":272,"width":16,"originX":0,"originY":0,"y":384},{"__children":[{"__name":"node","x":88,"y":248}],"__name":"zipMover","height":24,"id":31,"x":32,"width":16,"originX":0,"originY":0,"y":312},{"__name":"spikesUp","id":32,"x":32,"width":16,"originX":0,"originY":4,"y":312},{"__name":"spikesDown","id":33,"x":32,"width":16,"originX":0,"originY":0,"y":336},{"__children":[{"__name":"node","x":232,"y":136}],"__name":"zipMover","height":24,"id":34,"x":272,"width":16,"originX":0,"originY":0,"y":200},{"__name":"spikesUp","id":35,"x":272,"width":16,"originX":0,"originY":4,"y":200},{"__name":"spikesDown","id":36,"x":272,"width":16,"originX":0,"originY":0,"y":224},{"__name":"spikesRight","height":16,"id":37,"x":112,"originX":0,"originY":0,"y":608}]
+[
+    {
+        "__name": "player",
+        "id": 0,
+        "x": 8,
+        "originX": 4,
+        "originY": 8,
+        "y": 696
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 80,
+                "y": 648
+            }
+        ],
+        "__name": "zipMover",
+        "height": 24,
+        "id": 1,
+        "x": 16,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 648
+    },
+    {
+        "__name": "spikesUp",
+        "id": 2,
+        "x": 16,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "y": 648
+    },
+    {
+        "__name": "jumpThru",
+        "id": 3,
+        "x": 24,
+        "width": 24,
+        "originX": 0,
+        "originY": 0,
+        "y": 696
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 288,
+                "y": 616
+            }
+        ],
+        "__name": "zipMover",
+        "height": 24,
+        "id": 4,
+        "x": 288,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 672
+    },
+    {
+        "__name": "spikesRight",
+        "height": 352,
+        "id": 5,
+        "x": 8,
+        "originX": 0,
+        "originY": 0,
+        "y": 168
+    },
+    {
+        "__name": "spikesLeft",
+        "height": 552,
+        "id": 6,
+        "x": 312,
+        "originX": 4,
+        "originY": 0,
+        "y": 168
+    },
+    {
+        "__name": "spikesUp",
+        "id": 7,
+        "x": 288,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "y": 672
+    },
+    {
+        "__name": "spikesDown",
+        "id": 8,
+        "x": 288,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 696
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 16,
+                "y": 552
+            }
+        ],
+        "__name": "zipMover",
+        "height": 16,
+        "id": 10,
+        "x": 168,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 552
+    },
+    {
+        "__name": "spikesUp",
+        "id": 11,
+        "x": 168,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "y": 552
+    },
+    {
+        "__name": "spikesDown",
+        "id": 12,
+        "x": 168,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 568
+    },
+    {
+        "__name": "spikesDown",
+        "id": 13,
+        "x": 16,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 672
+    },
+    {
+        "__name": "crumbleBlock",
+        "id": 14,
+        "x": 80,
+        "width": 8,
+        "originX": 0,
+        "originY": 0,
+        "y": 592
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 16,
+                "y": 496
+            }
+        ],
+        "__name": "zipMover",
+        "height": 16,
+        "id": 15,
+        "x": 144,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 496
+    },
+    {
+        "__name": "spikesUp",
+        "id": 16,
+        "x": 144,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "y": 496
+    },
+    {
+        "__name": "spikesDown",
+        "id": 17,
+        "x": 144,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 512
+    },
+    {
+        "__name": "refill",
+        "id": 18,
+        "x": 56,
+        "originX": 4,
+        "originY": 4,
+        "y": 480
+    },
+    {
+        "__name": "spikesUp",
+        "id": 19,
+        "x": 8,
+        "width": 80,
+        "originX": 0,
+        "originY": 4,
+        "y": 528
+    },
+    {
+        "__name": "spikesRight",
+        "height": 56,
+        "id": 20,
+        "x": 8,
+        "originX": 0,
+        "originY": 0,
+        "y": 544
+    },
+    {
+        "__name": "spikesRight",
+        "height": 48,
+        "id": 21,
+        "x": 8,
+        "originX": 0,
+        "originY": 0,
+        "y": 624
+    },
+    {
+        "__name": "spikesUp",
+        "id": 22,
+        "x": 8,
+        "width": 104,
+        "originX": 0,
+        "originY": 4,
+        "y": 608
+    },
+    {
+        "__name": "crumbleBlock",
+        "id": 25,
+        "x": 72,
+        "width": 8,
+        "originX": 0,
+        "originY": 0,
+        "y": 448
+    },
+    {
+        "__name": "crumbleBlock",
+        "id": 26,
+        "x": 152,
+        "width": 8,
+        "originX": 0,
+        "originY": 0,
+        "y": 424
+    },
+    {
+        "__name": "crumbleBlock",
+        "id": 27,
+        "x": 232,
+        "width": 8,
+        "originX": 0,
+        "originY": 0,
+        "y": 400
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 208,
+                "y": 344
+            }
+        ],
+        "__name": "zipMover",
+        "height": 24,
+        "id": 28,
+        "x": 272,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 360
+    },
+    {
+        "__name": "spikesUp",
+        "id": 29,
+        "x": 272,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "y": 360
+    },
+    {
+        "__name": "spikesDown",
+        "id": 30,
+        "x": 272,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 384
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 88,
+                "y": 248
+            }
+        ],
+        "__name": "zipMover",
+        "height": 24,
+        "id": 31,
+        "x": 32,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 312
+    },
+    {
+        "__name": "spikesUp",
+        "id": 32,
+        "x": 32,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "y": 312
+    },
+    {
+        "__name": "spikesDown",
+        "id": 33,
+        "x": 32,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 336
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 232,
+                "y": 136
+            }
+        ],
+        "__name": "zipMover",
+        "height": 24,
+        "id": 34,
+        "x": 272,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 200
+    },
+    {
+        "__name": "spikesUp",
+        "id": 35,
+        "x": 272,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "y": 200
+    },
+    {
+        "__name": "spikesDown",
+        "id": 36,
+        "x": 272,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 224
+    },
+    {
+        "__name": "spikesRight",
+        "height": 16,
+        "id": 37,
+        "x": 112,
+        "originX": 0,
+        "originY": 0,
+        "y": 608
+    }
+]

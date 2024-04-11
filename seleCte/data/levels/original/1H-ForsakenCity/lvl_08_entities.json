@@ -1,1 +1,194 @@
-[{"__name":"jumpThru","id":0,"x":24,"width":24,"originX":0,"originY":0,"texture":"default","y":168},{"__name":"player","id":1,"x":32,"width":8,"originX":4,"originY":8,"y":168},{"theme":"Normal","__children":[{"__name":"node","x":120,"y":88}],"__name":"zipMover","height":24,"id":2,"x":120,"width":32,"originX":0,"originY":0,"y":128},{"__name":"spikesUp","id":3,"x":120,"width":32,"originX":0,"originY":4,"type":"default","y":128},{"__name":"spikesUp","id":4,"x":48,"width":64,"originX":0,"originY":4,"type":"default","y":160},{"__name":"spikesUp","id":6,"x":128,"width":16,"originX":0,"originY":4,"type":"default","y":56},{"__name":"crumbleBlock","id":7,"x":192,"width":8,"originX":0,"originY":0,"y":136},{"__name":"spikesUp","id":8,"x":176,"width":56,"originX":0,"originY":4,"type":"default","y":88},{"__name":"spikesRight","height":96,"id":9,"x":16,"originX":0,"originY":0,"type":"default","y":40},{"theme":"Normal","__children":[{"__name":"node","x":232,"y":152}],"__name":"zipMover","height":24,"id":10,"x":232,"width":16,"originX":0,"originY":0,"y":64},{"__name":"spikesUp","id":11,"x":232,"width":16,"originX":0,"originY":4,"type":"default","y":176},{"__name":"spikesUp","id":12,"x":248,"width":64,"originX":0,"originY":4,"type":"default","y":160},{"__name":"spikesUp","id":13,"x":248,"width":16,"originX":0,"originY":4,"type":"default","y":88},{"__name":"spikesUp","id":14,"x":232,"width":16,"originX":0,"originY":4,"type":"default","y":64},{"__name":"spikesLeft","height":104,"id":15,"x":312,"originX":4,"originY":0,"type":"default","y":40},{"__name":"spikesUp","id":16,"x":112,"width":64,"originX":0,"originY":4,"type":"default","y":168},{"__name":"spikesUp","id":18,"x":176,"width":40,"originX":0,"originY":4,"type":"default","y":160},{"__name":"checkpoint","id":19,"x":28,"originX":4,"originY":8,"y":160}]
+[
+    {
+        "__name": "jumpThru",
+        "id": 0,
+        "x": 24,
+        "width": 24,
+        "originX": 0,
+        "originY": 0,
+        "texture": "default",
+        "y": 168
+    },
+    {
+        "__name": "player",
+        "id": 1,
+        "x": 32,
+        "width": 8,
+        "originX": 4,
+        "originY": 8,
+        "y": 168
+    },
+    {
+        "theme": "Normal",
+        "__children": [
+            {
+                "__name": "node",
+                "x": 120,
+                "y": 88
+            }
+        ],
+        "__name": "zipMover",
+        "height": 24,
+        "id": 2,
+        "x": 120,
+        "width": 32,
+        "originX": 0,
+        "originY": 0,
+        "y": 128
+    },
+    {
+        "__name": "spikesUp",
+        "id": 3,
+        "x": 120,
+        "width": 32,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 128
+    },
+    {
+        "__name": "spikesUp",
+        "id": 4,
+        "x": 48,
+        "width": 64,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 160
+    },
+    {
+        "__name": "spikesUp",
+        "id": 6,
+        "x": 128,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 56
+    },
+    {
+        "__name": "crumbleBlock",
+        "id": 7,
+        "x": 192,
+        "width": 8,
+        "originX": 0,
+        "originY": 0,
+        "y": 136
+    },
+    {
+        "__name": "spikesUp",
+        "id": 8,
+        "x": 176,
+        "width": 56,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 88
+    },
+    {
+        "__name": "spikesRight",
+        "height": 96,
+        "id": 9,
+        "x": 16,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 40
+    },
+    {
+        "theme": "Normal",
+        "__children": [
+            {
+                "__name": "node",
+                "x": 232,
+                "y": 152
+            }
+        ],
+        "__name": "zipMover",
+        "height": 24,
+        "id": 10,
+        "x": 232,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 64
+    },
+    {
+        "__name": "spikesUp",
+        "id": 11,
+        "x": 232,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 176
+    },
+    {
+        "__name": "spikesUp",
+        "id": 12,
+        "x": 248,
+        "width": 64,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 160
+    },
+    {
+        "__name": "spikesUp",
+        "id": 13,
+        "x": 248,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 88
+    },
+    {
+        "__name": "spikesUp",
+        "id": 14,
+        "x": 232,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 64
+    },
+    {
+        "__name": "spikesLeft",
+        "height": 104,
+        "id": 15,
+        "x": 312,
+        "originX": 4,
+        "originY": 0,
+        "type": "default",
+        "y": 40
+    },
+    {
+        "__name": "spikesUp",
+        "id": 16,
+        "x": 112,
+        "width": 64,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 168
+    },
+    {
+        "__name": "spikesUp",
+        "id": 18,
+        "x": 176,
+        "width": 40,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 160
+    },
+    {
+        "__name": "checkpoint",
+        "id": 19,
+        "x": 28,
+        "originX": 4,
+        "originY": 8,
+        "y": 160
+    }
+]

@@ -1,1 +1,47 @@
-[{"__name":"memorial","id":0,"x":160,"originX":16,"originY":16,"dreaming":false,"y":128},{"__name":"jumpThru","id":1,"x":48,"width":24,"originX":0,"originY":0,"texture":"default","y":160},{"__name":"player","id":2,"x":56,"width":8,"originX":4,"originY":8,"y":160},{"__name":"bonfire","mode":"unlit","id":3,"x":256,"originX":0,"originY":16,"y":152},{"__name":"memorialTextController","id":4,"x":104,"originX":8,"originY":8,"y":88}]
+[
+    {
+        "__name": "memorial",
+        "id": 0,
+        "x": 160,
+        "originX": 16,
+        "originY": 16,
+        "dreaming": false,
+        "y": 128
+    },
+    {
+        "__name": "jumpThru",
+        "id": 1,
+        "x": 48,
+        "width": 24,
+        "originX": 0,
+        "originY": 0,
+        "texture": "default",
+        "y": 160
+    },
+    {
+        "__name": "player",
+        "id": 2,
+        "x": 56,
+        "width": 8,
+        "originX": 4,
+        "originY": 8,
+        "y": 160
+    },
+    {
+        "__name": "bonfire",
+        "mode": "unlit",
+        "id": 3,
+        "x": 256,
+        "originX": 0,
+        "originY": 16,
+        "y": 152
+    },
+    {
+        "__name": "memorialTextController",
+        "id": 4,
+        "x": 104,
+        "originX": 8,
+        "originY": 8,
+        "y": 88
+    }
+]
