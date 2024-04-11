@@ -1,1 +1,317 @@
-[{"__name":"player","id":49,"x":8,"width":8,"originX":4,"originY":8,"y":104},{"x":128,"__name":"fallingBlock","height":16,"tiletype":3,"id":50,"originX":0,"y":96,"climbFall":true,"width":16,"originY":0,"behind":false},{"x":232,"__name":"fallingBlock","height":16,"tiletype":3,"id":51,"originX":0,"y":64,"climbFall":true,"width":16,"originY":0,"behind":false},{"x":288,"__name":"fallingBlock","height":16,"tiletype":3,"id":52,"originX":0,"y":96,"climbFall":true,"width":16,"originY":0,"behind":false},{"__name":"spikesUp","id":53,"x":232,"width":16,"originX":0,"originY":4,"type":"default","y":64},{"__children":[{"__name":"node","x":464,"y":96}],"__name":"zipMover","height":16,"id":54,"x":464,"width":16,"originX":0,"originY":0,"y":152},{"__name":"spikesUp","id":55,"x":464,"width":16,"originX":0,"originY":4,"type":"default","y":152},{"__name":"spikesDown","id":57,"x":488,"width":136,"originX":0,"originY":0,"type":"default","y":40},{"__children":[{"__name":"node","x":592,"y":152}],"__name":"zipMover","height":16,"id":58,"x":512,"width":16,"originX":0,"originY":0,"y":152},{"__name":"spikesUp","id":59,"x":512,"width":16,"originX":0,"originY":4,"type":"default","y":152},{"__children":[{"__name":"node","x":800,"y":96}],"__name":"zipMover","height":16,"id":60,"x":800,"width":16,"originX":0,"originY":0,"y":152},{"__name":"spikesUp","id":61,"x":800,"width":16,"originX":0,"originY":4,"type":"default","y":152},{"__name":"jumpThru","id":62,"x":768,"width":16,"originX":0,"originY":0,"texture":"default","y":32},{"__name":"spikesDown","id":63,"x":656,"width":112,"originX":0,"originY":0,"type":"default","y":48},{"__name":"spikesDown","id":64,"x":784,"width":48,"originX":0,"originY":0,"type":"default","y":48},{"__name":"spikesDown","id":65,"x":624,"width":32,"originX":0,"originY":0,"type":"default","y":56},{"__name":"player","id":66,"x":936,"width":8,"originX":4,"originY":8,"y":88},{"__name":"jumpThru","id":67,"x":40,"width":24,"originX":0,"originY":0,"texture":"default","y":152},{"__name":"towerviewer","summit":false,"id":68,"x":56,"originX":4,"originY":16,"y":152},{"__name":"spikesUp","id":73,"x":448,"width":32,"originX":0,"originY":4,"type":"default","y":48},{"__name":"spikesLeft","height":32,"id":74,"x":472,"originX":4,"originY":0,"type":"default","y":64},{"__name":"spikesDown","id":75,"x":416,"width":16,"originX":0,"originY":0,"type":"default","y":56},{"__name":"spikesDown","id":76,"x":448,"width":24,"originX":0,"originY":0,"type":"default","y":56},{"__children":[{"__name":"node","x":488,"y":24}],"__name":"wire","above":false,"id":77,"x":432,"originX":4,"originY":4,"y":16},{"__children":[{"__name":"node","x":928,"y":56}],"__name":"wire","above":false,"id":78,"x":864,"originX":4,"originY":4,"y":48},{"__children":[{"__name":"node","x":552,"y":40}],"__name":"wire","above":false,"id":79,"x":480,"originX":4,"originY":4,"y":80},{"__name":"spikesLeft","height":16,"id":81,"x":512,"originX":4,"originY":0,"type":"default","y":152}]
+[
+    {
+        "__name": "player",
+        "id": 49,
+        "x": 8,
+        "width": 8,
+        "originX": 4,
+        "originY": 8,
+        "y": 104
+    },
+    {
+        "x": 128,
+        "__name": "fallingBlock",
+        "height": 16,
+        "tiletype": 3,
+        "id": 50,
+        "originX": 0,
+        "y": 96,
+        "climbFall": true,
+        "width": 16,
+        "originY": 0,
+        "behind": false
+    },
+    {
+        "x": 232,
+        "__name": "fallingBlock",
+        "height": 16,
+        "tiletype": 3,
+        "id": 51,
+        "originX": 0,
+        "y": 64,
+        "climbFall": true,
+        "width": 16,
+        "originY": 0,
+        "behind": false
+    },
+    {
+        "x": 288,
+        "__name": "fallingBlock",
+        "height": 16,
+        "tiletype": 3,
+        "id": 52,
+        "originX": 0,
+        "y": 96,
+        "climbFall": true,
+        "width": 16,
+        "originY": 0,
+        "behind": false
+    },
+    {
+        "__name": "spikesUp",
+        "id": 53,
+        "x": 232,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 64
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 464,
+                "y": 96
+            }
+        ],
+        "__name": "zipMover",
+        "height": 16,
+        "id": 54,
+        "x": 464,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 152
+    },
+    {
+        "__name": "spikesUp",
+        "id": 55,
+        "x": 464,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 152
+    },
+    {
+        "__name": "spikesDown",
+        "id": 57,
+        "x": 488,
+        "width": 136,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 40
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 592,
+                "y": 152
+            }
+        ],
+        "__name": "zipMover",
+        "height": 16,
+        "id": 58,
+        "x": 512,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 152
+    },
+    {
+        "__name": "spikesUp",
+        "id": 59,
+        "x": 512,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 152
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 800,
+                "y": 96
+            }
+        ],
+        "__name": "zipMover",
+        "height": 16,
+        "id": 60,
+        "x": 800,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "y": 152
+    },
+    {
+        "__name": "spikesUp",
+        "id": 61,
+        "x": 800,
+        "width": 16,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 152
+    },
+    {
+        "__name": "jumpThru",
+        "id": 62,
+        "x": 768,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "texture": "default",
+        "y": 32
+    },
+    {
+        "__name": "spikesDown",
+        "id": 63,
+        "x": 656,
+        "width": 112,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 48
+    },
+    {
+        "__name": "spikesDown",
+        "id": 64,
+        "x": 784,
+        "width": 48,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 48
+    },
+    {
+        "__name": "spikesDown",
+        "id": 65,
+        "x": 624,
+        "width": 32,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 56
+    },
+    {
+        "__name": "player",
+        "id": 66,
+        "x": 936,
+        "width": 8,
+        "originX": 4,
+        "originY": 8,
+        "y": 88
+    },
+    {
+        "__name": "jumpThru",
+        "id": 67,
+        "x": 40,
+        "width": 24,
+        "originX": 0,
+        "originY": 0,
+        "texture": "default",
+        "y": 152
+    },
+    {
+        "__name": "towerviewer",
+        "summit": false,
+        "id": 68,
+        "x": 56,
+        "originX": 4,
+        "originY": 16,
+        "y": 152
+    },
+    {
+        "__name": "spikesUp",
+        "id": 73,
+        "x": 448,
+        "width": 32,
+        "originX": 0,
+        "originY": 4,
+        "type": "default",
+        "y": 48
+    },
+    {
+        "__name": "spikesLeft",
+        "height": 32,
+        "id": 74,
+        "x": 472,
+        "originX": 4,
+        "originY": 0,
+        "type": "default",
+        "y": 64
+    },
+    {
+        "__name": "spikesDown",
+        "id": 75,
+        "x": 416,
+        "width": 16,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 56
+    },
+    {
+        "__name": "spikesDown",
+        "id": 76,
+        "x": 448,
+        "width": 24,
+        "originX": 0,
+        "originY": 0,
+        "type": "default",
+        "y": 56
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 488,
+                "y": 24
+            }
+        ],
+        "__name": "wire",
+        "above": false,
+        "id": 77,
+        "x": 432,
+        "originX": 4,
+        "originY": 4,
+        "y": 16
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 928,
+                "y": 56
+            }
+        ],
+        "__name": "wire",
+        "above": false,
+        "id": 78,
+        "x": 864,
+        "originX": 4,
+        "originY": 4,
+        "y": 48
+    },
+    {
+        "__children": [
+            {
+                "__name": "node",
+                "x": 552,
+                "y": 40
+            }
+        ],
+        "__name": "wire",
+        "above": false,
+        "id": 79,
+        "x": 480,
+        "originX": 4,
+        "originY": 4,
+        "y": 80
+    },
+    {
+        "__name": "spikesLeft",
+        "height": 16,
+        "id": 81,
+        "x": 512,
+        "originX": 4,
+        "originY": 0,
+        "type": "default",
+        "y": 152
+    }
+]
