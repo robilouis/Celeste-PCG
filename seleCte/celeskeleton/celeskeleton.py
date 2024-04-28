@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 
 class Room:
 
-    def __init__(self, width=1, height=1, origin_x=0, origin_y=0) -> None:
+    def __init__(self, width=1, height=1, origin_x=0, origin_y=0, status=None) -> None:
         if width <= 0 or height <= 0:
             raise ValueError("Width and height have to be positive!")
         self.size: list[int] = [width, height]
@@ -29,7 +29,11 @@ class Room:
             "left": [],
             "right": [],
         }
-        self.data: np.array[object] = np.zeros((self.size[1], self.size[0]), dtype=str)
+        self.data: np.array[object] = np.zeros((self.size[1], self.size[0]), dtype=int).astype(str)
+        self.status = status
+    
+    def get_status(self):
+        return self.status
 
     def get_size(self):
         return self.size
@@ -42,7 +46,7 @@ class Room:
 
     def description(self):
         print(
-            f"Bottom-left corner position: {self.origin}\nRoom size: {self.size}\nExits: {self.exits}\nData: {self.data}"
+            f"Bottom-left corner position: {self.origin}\nRoom size: {self.size}\nExits: {self.exits}\nData: {self.data}\nStatus: {self.status}"
         )
 
     def get_tr_corner(self):
@@ -62,6 +66,12 @@ class Room:
         Clears exits dict
         """
         self.exits = {"up": [], "down": [], "left": [], "right": []}
+    
+    def set_status(self, status):
+        if status == "start" or status == "end":
+            self.status = status
+        else:
+            raise ValueError("Room can only have start or end status, or None.")
 
     def set_size(self, w, h):
         """
@@ -256,10 +266,10 @@ class Room:
         for exit in self.exits["down"]:
             l_points.append((self.size[1] - 1, int(np.mean(exit)) - self.origin[0]))
         for exit in self.exits["left"]:
-            l_points.append((self.origin[1] - int(np.mean(exit)) + self.size[1], 0))
+            l_points.append((self.origin[1] + int(np.mean(exit)), 0))
         for exit in self.exits["right"]:
             l_points.append(
-                (self.origin[1] - int(np.mean(exit)) + self.size[1], self.size[0] - 1)
+                (self.origin[1] + int(np.mean(exit)), self.size[0] - 1)
             )
 
         return l_points
@@ -315,6 +325,75 @@ class Room:
         if return_path:
             return room_path
         return True
+    
+    def is_valid_special(self, sp, return_path=False, verbose=False):
+        """
+        Assert whether a special point (starting/ending) is valid,
+        ie. is connected to all room exits
+        """
+        room_astar_ready = self.extract_astar_ready_data()
+        room_exits_points = self.get_starting_ending_points()
+        for pt in room_exits_points:
+            sp_to_exits = utils.astar(room_astar_ready, sp, pt)
+            if not sp_to_exits:
+                if verbose:
+                    logger.warning("Special point cannot reach all room exits")
+                return False
+        if verbose:
+            logger.info("Playability check succeeded - special point is valid")
+        if return_path:
+            return sp_to_exits
+        return True
+    
+    def add_respawn_points(self):
+        """
+        Add player entities near entries to enable room access
+        """
+        offsets = {
+            "up": (np.array([2, 0]), 1, 0),
+            "down": (np.array([self.size[1] - 3, 0]), 1, 0),
+            "left": (np.array([0, 2]), 0, 1),
+            "right": (np.array([0, self.size[0] - 3]), 0, 1)
+            }
+        for side in ["up", "down", "left", "right"]:
+            for exit in self.exits[side]:
+                respawn_xy = offsets[side][0]
+                respawn_xy[offsets[side][1]] = int(np.mean(exit)-self.origin[offsets[side][2]])
+                
+                self.data[respawn_xy[0], respawn_xy[1]] = "P"
+    
+    def add_special_points(self, nb_tries_limit, verbose=False):
+        """
+        Add structure with player spawn point if starting room or crystal heart if
+        ending room
+        """
+        if not self.status:
+            if verbose:
+                logger.info("This room is neither a starting not an ending room - skipping.")
+            return True
+        
+        valid_sp = False
+        try_iter = 0
+        while not valid_sp and try_iter < nb_tries_limit: # avoids softlock in the middle of lvl gen
+            try_iter += 1
+            random_sp = tuple(np.random.randint([self.size[1]-4, self.size[0]-3]) + np.array([3, 1]))
+            valid_sp = self.is_valid_special(random_sp)
+
+        if not valid_sp: # something is probably wrong with room - need re-gen
+            if verbose:
+                logger.error(f"Algorithm did not find a special point in {nb_tries_limit} iterations.")
+            return False
+        
+        if verbose:
+            logger.info(f"Special point found in {try_iter} iterations.")
+        if self.status == "end":
+            self.data[random_sp[0], random_sp[1]] = "H"
+        elif self.status == "start":
+            self.data[random_sp[0], random_sp[1]:random_sp[1]+3] = "D"
+            self.data[random_sp[0]-1, random_sp[1]+1] = "P"
+        else:
+            raise ValueError("Status should be either None, 'start' or 'end'!")
+        return True
 
 
 class Cskeleton:
@@ -337,6 +416,12 @@ class Cskeleton:
 
     def get_nb_rooms(self):
         return len(list(self.lvl.keys()))
+    
+    def get_starting_rooms(self):
+        return [room for room in self.lvl if self.lvl[room].get_status() == "start"]
+    
+    def get_ending_rooms(self):
+        return [room for room in self.lvl if self.lvl[room].get_status() == "end"]
 
     def add_room(self, room, name):
         if name in self.lvl.keys():
@@ -576,6 +661,8 @@ def PCG_skeleton(nb_rooms, p=0.5, size=None):
         skeleton.add_room(room, room_name)
 
     skeleton.set_start_end()
+    skeleton.lvl[skeleton.starting_room].set_status("start")
+    skeleton.lvl[skeleton.ending_room].set_status("end")
 
     return skeleton
 

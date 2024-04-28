@@ -35,18 +35,26 @@ def main(args):
     pcg_gen_lvl = celeskeleton.PCG_skeleton(args.nb_rooms, args.proba, rs)
 
     for room_nb in range(1, args.nb_rooms + 1):
-        playable = False
+        playable, special_point_added = False, False
         nb_tries = 0
-        while not playable and nb_tries < 10:
+        while (not playable or not special_point_added) and nb_tries < 10:
             nb_tries += 1
+            logger.info(f"Room {room_nb}, try nb {nb_tries} - Playable: {playable} / SP added: {special_point_added}")
             temp_data = utils.generate_room(d_proba_estimation, backtracking_depth=btd)
             pcg_gen_lvl.get_room_by_name(f"room_{room_nb}").set_data(temp_data)
-            playable = pcg_gen_lvl.get_room_by_name(
+            temp_room = pcg_gen_lvl.get_room_by_name(
                 f"room_{room_nb}"
-            ).is_playable_room()
+            )
+            temp_room.add_respawn_points()
+            special_point_added = temp_room.add_special_points(nb_tries_limit=5)
+            playable = temp_room.is_playable_room()
         if not playable:
             logger.error(
                 f"GENERATION FAILED - A* algo did not succeed for room {room_nb}"
+            )
+        if not special_point_added:
+            logger.error(
+                f"GENERATION FAILED - impossible to add {temp_room.status} structure for room {room_nb}"
             )
         logger.info(f"Generated room {room_nb} in {nb_tries} iterations.")
 

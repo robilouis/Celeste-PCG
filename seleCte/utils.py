@@ -48,6 +48,7 @@ def color_map(val):
         "R": "lime",
         "F": "yellow",
         "L": "lightblue",
+        "H": "black",
         "0": None,
     }
     return "background-color: %s" % color_dict[val]
@@ -392,25 +393,4 @@ def evaluate_room_complexity(room):
 
 
 def evaluate_room_interestingness(room):
-    raise NotImplementedError
-
-
-def add_starting_point(room):
-    """
-    Add structure with player spawn point in the starting room
-    """
-    raise NotImplementedError
-
-
-def add_ending_point(room):
-    """
-    Add structure with flag/heart/ending point in the final room
-    """
-    raise NotImplementedError
-
-
-def add_respawn_points(room):
-    """
-    Add player entities near entries to enable room access
-    """
     raise NotImplementedError
