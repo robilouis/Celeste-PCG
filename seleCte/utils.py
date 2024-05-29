@@ -28,7 +28,123 @@ ALL_TILES_AND_ENTITIES = [
     "L",
 ]
 
+VALID_FG_TILES = [
+    "1",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "G",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "z",
+]
 
+VALID_BG_TILES = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+]
+
+MDMC_MATRICES = {
+    "d1": np.array(
+        [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 1, 2],
+        ]
+    ),
+    "d2": np.array(
+        [
+            [0, 0, 0],
+            [0, 0, 0],
+            [1, 1, 2],
+        ]
+    ),
+    "d3": np.array(
+        [
+            [0, 0, 0],
+            [0, 0, 1],
+            [0, 1, 2],
+        ]
+    ),
+    "d4": np.array(
+        [
+            [0, 0, 0],
+            [0, 1, 0],
+            [0, 1, 2],
+        ]
+    ),
+    "d5": np.array(
+        [
+            [0, 0, 0],
+            [0, 1, 1],
+            [0, 1, 2],
+        ]
+    ),
+    "d6": np.array(
+        [
+            [0, 0, 0],
+            [0, 0, 1],
+            [1, 1, 2],
+        ]
+    ),
+    "d7": np.array(
+        [
+            [0, 0, 0],
+            [0, 1, 1],
+            [1, 1, 2],
+        ]
+    ),
+}
+
+
+# Functions for DPE extraction
+def submatrix_to_count(array, mdmc_matrix):
+    idx = np.where(mdmc_matrix == 1)
+    return (
+        "".join(array[idx[0][k], idx[1][k]] for k in range(idx[0].shape[0])),
+        array[-1, -1],
+    )
+
+
+def get_all_submatrices(array, size=2):
+    xmax, ymax = array.shape
+    all_submatrices = []
+    for x in range(xmax - size):
+        for y in range(ymax - size):
+            all_submatrices.append(array[x : x + size + 1, y : y + size + 1])
+    return all_submatrices
+
+
+# Functions for visualization
 def color_map(val):
     color_dict = {
         "1": "salmon",
@@ -60,19 +176,17 @@ def visualize_room(array):
     return df_visu
 
 
-def generate_empty_room(width=40, height=23):
-    room = np.zeros((height, width), dtype=str)
-    room[0, :] = "1"
-    room[:, 0] = "1"
-    room[-1, :] = "1"
-    room[:, -1] = "1"
-    room[1, 1:-1] = "0"
-    room[1:-1, 1] = "0"
+def generate_empty_room_data(width=40, height=23):
+    room_data = np.zeros((height, width), dtype=int).astype(str)
+    room_data[0, :] = "1"
+    room_data[:, 0] = "1"
+    room_data[-1, :] = "1"
+    room_data[:, -1] = "1"
 
-    return room
+    return room_data
 
 
-# Helper functions for generating PE dicts for MdMC model
+# Helper functions for extracting pattern proba for MdMC model
 def extract_pattern(array, x, y):
     return "".join((array[x + 1, y + 1], array[x + 1, y + 2], array[x + 2, y + 1]))
 
@@ -99,7 +213,7 @@ def generate_new_tile(proba_dist, all_symbols=ALL_TILES_AND_ENTITIES, exclude=[]
         new_tile = np.random.choice(
             a=list(proba_dist.keys()), p=list(proba_dist.values())
         )
-        while new_tile in exclude:
+        if new_tile in exclude:
             new_tile = np.random.choice(
                 a=list(proba_dist.keys()), p=list(proba_dist.values())
             )
@@ -108,7 +222,6 @@ def generate_new_tile(proba_dist, all_symbols=ALL_TILES_AND_ENTITIES, exclude=[]
 
 
 def update_room_array(array, x, y, d_proba_estimation, bt_depth=0, verbose=True):
-
     bt_depth_true = bt_depth_true = min(bt_depth, array.shape[1] - y - 3)
     # if bt depth > 0, needs to apply backtracking
     # everytime you pick a symbol, add it to excluded - if cannot pick: random pick
@@ -153,15 +266,16 @@ def update_room_array(array, x, y, d_proba_estimation, bt_depth=0, verbose=True)
     return array
 
 
-def generate_room(
-    d_proba_estimation, width=40, height=23, backtracking_depth=0, verbose=False
+def generate_room_data(
+    d_proba_estimation, room_size=[40, 23], backtracking_depth=0, verbose=False
 ):
-    room = generate_empty_room(width, height)
+    width, height = room_size[0], room_size[1]
+    room_data = generate_empty_room_data(width, height)
 
     for x in range(height - 2):
         for y in range(width - 2):
-            room = update_room_array(
-                room,
+            room_data = update_room_array(
+                room_data,
                 x,
                 y,
                 d_proba_estimation,
@@ -169,7 +283,7 @@ def generate_room(
                 verbose=verbose,
             )
 
-    return room
+    return room_data
 
 
 def generate_room_batch(
@@ -184,10 +298,10 @@ def generate_room_batch(
     if not os.path.exists(path_folder_to_save):
         os.mkdir(path_folder_to_save)
     for i in range(n_rooms):
-        room_temp = generate_room(
+        room_data_temp = generate_room_data(
             d_proba_estimation, width, height, backtracking_depth, verbose
         )
-        pd.DataFrame(room_temp).to_csv(
+        pd.DataFrame(room_data_temp).to_csv(
             f"{path_folder_to_save}/room_{i}_generated_MdMC.csv",
             header=None,
             index=None,
@@ -238,11 +352,7 @@ def return_path(current_node):
 
 def astar(maze, start, end, allow_diagonal_movement=True, verbose=False):
     """
-    Returns a list of tuples as a path from the given start to the given end in the given maze
-    :param maze:
-    :param start:
-    :param end:
-    :return:
+    Returns - if exists - a list of tuples as a path from the given start to the given end in the given maze
     """
 
     nb_iter = 0

@@ -29,9 +29,11 @@ class Room:
             "left": [],
             "right": [],
         }
-        self.data: np.array[object] = np.zeros((self.size[1], self.size[0]), dtype=int).astype(str)
+        self.data: np.array[object] = np.zeros(
+            (self.size[1], self.size[0]), dtype=int
+        ).astype(str)
         self.status = status
-    
+
     def get_status(self):
         return self.status
 
@@ -66,7 +68,7 @@ class Room:
         Clears exits dict
         """
         self.exits = {"up": [], "down": [], "left": [], "right": []}
-    
+
     def set_status(self, status):
         if status == "start" or status == "end":
             self.status = status
@@ -268,16 +270,13 @@ class Room:
         for exit in self.exits["left"]:
             l_points.append((self.origin[1] + int(np.mean(exit)), 0))
         for exit in self.exits["right"]:
-            l_points.append(
-                (self.origin[1] + int(np.mean(exit)), self.size[0] - 1)
-            )
+            l_points.append((self.origin[1] + int(np.mean(exit)), self.size[0] - 1))
 
         return l_points
 
     def extract_astar_ready_data(self):
         rdy_data = pd.DataFrame(self.data)
-        rdy_data = rdy_data.map(lambda x: "0" if x == "L" else x)
-        rdy_data = rdy_data.map(lambda x: "0" if x == "D" else x)
+        rdy_data = rdy_data.map(lambda x: "0" if x in ["L", "D", "P"] else x)
         rdy_data = rdy_data.map(lambda x: "1" if x != "0" else x)
         rdy_data = rdy_data.to_numpy(dtype=int)
         return rdy_data
@@ -286,17 +285,17 @@ class Room:
         def _create_exits(data, a, b, side, origin):
             height = data.shape[0]
             if side == "left":
-                x, y = height - (b - origin[1]) - 1, height - (a - origin[1]) - 1
-                data[x : y + 1, 0] = 0
+                x, y = (a - origin[1]) - 1, (b - origin[1]) - 1
+                data[x : y + 1, 0] = "0"
             elif side == "right":
-                x, y = height - (b - origin[1]) - 1, height - (a - origin[1]) - 1
-                data[x : y + 1, -1] = 0
+                x, y = (a - origin[1]) - 1, (b - origin[1]) - 1
+                data[x : y + 1, -1] = "0"
             elif side == "up":
                 x, y = a - origin[0], b - origin[0]
-                data[0, x : y + 1] = 0
+                data[0, x : y + 1] = "0"
             elif side == "down":
                 x, y = a - origin[0], b - origin[0]
-                data[-1, x : y + 1] = 0
+                data[-1, x : y + 1] = "0"
             else:
                 return KeyError
             return data
@@ -309,12 +308,17 @@ class Room:
                 )
 
     def is_playable_room(self, return_path=False, verbose=False):
-        room_exits_points = self.get_starting_ending_points()
+        # Preprocessing the room data
         room_astar_ready = self.extract_astar_ready_data()
-        if len(room_exits_points) > 1:  # not a dead end or a starting/ending room
-            for pt1, pt2 in itertools.combinations(
-                room_exits_points, 2
-            ):  # make sure all exits are reachable
+
+        # Extracting exits ie. supposedly connected points
+        room_exits_points = self.get_starting_ending_points()
+        nb_exits = len(room_exits_points)
+
+        if nb_exits > 1:  # not a dead end or a starting/ending room
+            for k in range(nb_exits - 1):
+                # use transitivity
+                pt1, pt2 = room_exits_points[k], room_exits_points[k + 1]
                 room_path = utils.astar(room_astar_ready, pt1, pt2)
                 if not room_path:
                     if verbose:
@@ -325,7 +329,7 @@ class Room:
         if return_path:
             return room_path
         return True
-    
+
     def is_valid_special(self, sp, return_path=False, verbose=False):
         """
         Assert whether a special point (starting/ending) is valid,
@@ -344,8 +348,8 @@ class Room:
         if return_path:
             return sp_to_exits
         return True
-    
-    def add_respawn_points(self):
+
+    def add_respawn_points(self, clear_space_size=2):
         """
         Add player entities near entries to enable room access
         """
@@ -353,44 +357,61 @@ class Room:
             "up": (np.array([2, 0]), 1, 0),
             "down": (np.array([self.size[1] - 3, 0]), 1, 0),
             "left": (np.array([0, 2]), 0, 1),
-            "right": (np.array([0, self.size[0] - 3]), 0, 1)
-            }
+            "right": (np.array([0, self.size[0] - 3]), 0, 1),
+        }
         for side in ["up", "down", "left", "right"]:
             for exit in self.exits[side]:
                 respawn_xy = offsets[side][0]
-                respawn_xy[offsets[side][1]] = int(np.mean(exit)-self.origin[offsets[side][2]])
-                
+                respawn_xy[offsets[side][1]] = int(
+                    np.mean(exit) - self.origin[offsets[side][2]]
+                )
                 self.data[respawn_xy[0], respawn_xy[1]] = "P"
-    
+                for i, j in [
+                    (a, b)
+                    for a in range(-1 * clear_space_size + 1, clear_space_size)
+                    for b in range(-1 * clear_space_size + 1, clear_space_size)
+                    if (a, b) != (0, 0)
+                ]:
+                    self.data[respawn_xy[0] + i, respawn_xy[1] + j] = "0"
+
     def add_special_points(self, nb_tries_limit, verbose=False):
         """
         Add structure with player spawn point if starting room or crystal heart if
-        ending room
+        ending room - returns a boolean whether it worked within nb_tries_limit tries
         """
         if not self.status:
             if verbose:
-                logger.info("This room is neither a starting not an ending room - skipping.")
+                logger.info(
+                    "This room is neither a starting not an ending room - skipping."
+                )
             return True
-        
+
         valid_sp = False
         try_iter = 0
-        while not valid_sp and try_iter < nb_tries_limit: # avoids softlock in the middle of lvl gen
+        while (
+            not valid_sp and try_iter < nb_tries_limit
+        ):  # avoids softlock in the middle of lvl gen
             try_iter += 1
-            random_sp = tuple(np.random.randint([self.size[1]-4, self.size[0]-3]) + np.array([3, 1]))
+            random_sp = tuple(
+                np.random.randint([self.size[1] - 4, self.size[0] - 3])
+                + np.array([3, 1])
+            )
             valid_sp = self.is_valid_special(random_sp)
 
-        if not valid_sp: # something is probably wrong with room - need re-gen
+        if not valid_sp:  # something is probably wrong with room - need re-gen
             if verbose:
-                logger.error(f"Algorithm did not find a special point in {nb_tries_limit} iterations.")
+                logger.warning(
+                    f"Could not find a special point in {nb_tries_limit} iterations - re-generating room."
+                )
             return False
-        
+
         if verbose:
             logger.info(f"Special point found in {try_iter} iterations.")
         if self.status == "end":
             self.data[random_sp[0], random_sp[1]] = "H"
         elif self.status == "start":
-            self.data[random_sp[0], random_sp[1]:random_sp[1]+3] = "D"
-            self.data[random_sp[0]-1, random_sp[1]+1] = "P"
+            self.data[random_sp[0], random_sp[1] - 1 : random_sp[1] + 2] = "D"
+            self.data[random_sp[0] - 1, random_sp[1]] = "P"
         else:
             raise ValueError("Status should be either None, 'start' or 'end'!")
         return True
@@ -416,10 +437,10 @@ class Cskeleton:
 
     def get_nb_rooms(self):
         return len(list(self.lvl.keys()))
-    
+
     def get_starting_rooms(self):
         return [room for room in self.lvl if self.lvl[room].get_status() == "start"]
-    
+
     def get_ending_rooms(self):
         return [room for room in self.lvl if self.lvl[room].get_status() == "end"]
 
@@ -595,27 +616,35 @@ class Cskeleton:
             room.set_data(_create_full_borders_room(room.data))
             room = room.create_exits_in_matrix()
 
-    # TODO: adapt to 1-exit rooms for space assertion once the strawberry spawner is done
-    def is_playable(self, return_paths=False):
-        l_paths = []
-        for i in range(len(self.list_all_rooms())):
-            temp_room = self.get_room_by_name(f"room_{i+1}")
-            temp_exits_points = temp_room.get_starting_ending_points()
-            temp_map = temp_room.extract_astar_ready_data()
-            if len(temp_exits_points) > 1:  # not a dead end or a starting/ending room
-                for pt1, pt2 in itertools.combinations(
-                    temp_exits_points, 2
-                ):  # make sure all exits are reachable
-                    temp_path = utils.astar(temp_map, pt1, pt2)
-                    l_paths.append((f"room_{i+1}", temp_path))
-                    if not temp_path:
-                        logger.warning(f"A* room playability failed in room {i+1}")
-                        return False
+    # # TODO: adapt to 1-exit rooms for space assertion once the strawberry spawner is done
+    # def is_playable(self, return_paths=False):
+    #     l_paths = []
+    #     for i in range(len(self.list_all_rooms())):
+    #         temp_room = self.get_room_by_name(f"room_{i+1}")
+    #         temp_exits_points = temp_room.get_starting_ending_points()
+    #         temp_map = temp_room.extract_astar_ready_data()
+    #         if len(temp_exits_points) > 1:  # not a dead end or a starting/ending room
+    #             for pt1, pt2 in itertools.combinations(
+    #                 temp_exits_points, 2
+    #             ):  # make sure all exits are reachable
+    #                 temp_path = utils.astar(temp_map, pt1, pt2)
+    #                 l_paths.append((f"room_{i+1}", temp_path))
+    #                 if not temp_path:
+    #                     logger.warning(f"A* room playability failed in room {i+1}")
+    #                     return False
 
-        logger.info("Playability check succeeded!")
-        if return_paths:
-            return l_paths
-        return True
+    #     logger.info("Playability check succeeded!")
+    #     if return_paths:
+    #         return l_paths
+    #     return True
+
+    def extract_rooms_metadata(self):
+        rooms_metadata = []
+        for room_name in self.list_all_rooms():
+            room = self.get_room_by_name(room_name)
+            rooms_metadata.append((room.size, room.origin, room.exits))
+
+        return rooms_metadata
 
 
 def PCG_skeleton(nb_rooms, p=0.5, size=None):

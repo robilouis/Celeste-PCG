@@ -2,6 +2,10 @@ using CSV
 using DataFrames
 using DelimitedFiles
 using JSON
+using Pkg
+
+Pkg.add(PackageSpec(url="https://github.com/robilouis/Maple.git"))
+
 using Maple
 
 
@@ -54,3 +58,4 @@ open("./seleCte/pcg/pcg_model_results/$lvl_folder_name/data.json", "r") do f
 end
 
 create_map_file(d_metadata_lvl, "./seleCte/pcg/pcg_model_results/$lvl_folder_name", output_bin_file_name)
+println("Done!")
