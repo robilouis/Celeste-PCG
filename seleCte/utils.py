@@ -28,13 +28,7 @@ ALL_TILES_AND_ENTITIES = [
     "L",
 ]
 
-LETHAL_ENTITIES = [
-    "^",
-    "<",
-    "v",
-    ">",
-    "S"
-]
+LETHAL_ENTITIES = ["^", "<", "v", ">", "S"]
 
 NL_ENTITES = [
     "D",
@@ -516,12 +510,18 @@ def astar(maze, start, end, allow_diagonal_movement=True, verbose=False):
     return None
 
 
-## Evaluation time 
+## Evaluation time
 def get_interest_space(array, path, sensibility=5):
     xmax, ymax = array.shape
     l_interest_area, potential_neighbors = [], []
     for x, y in path:
-        potential_neighbors.extend([(x+i, y+j) for i in range(-1*sensibility, sensibility+1) for j in range(-1*sensibility, sensibility+1)])
+        potential_neighbors.extend(
+            [
+                (x + i, y + j)
+                for i in range(-1 * sensibility, sensibility + 1)
+                for j in range(-1 * sensibility, sensibility + 1)
+            ]
+        )
     for x_pot, y_pot in potential_neighbors:
         if x_pot >= 0 and x_pot < xmax and y_pot >= 0 and y_pot < ymax:
             l_interest_area.append((x_pot, y_pot))
@@ -529,7 +529,12 @@ def get_interest_space(array, path, sensibility=5):
 
 
 def extract_entity_coords(room, symbol):
-    return [(x, y) for x, y in zip(np.where(room.data == symbol)[0], np.where(room.data == symbol)[1])]
+    return [
+        (x, y)
+        for x, y in zip(
+            np.where(room.data == symbol)[0], np.where(room.data == symbol)[1]
+        )
+    ]
 
 
 def evaluate_astar_path(room, path):  # TODO
@@ -560,7 +565,7 @@ def evaluate_room_interestingness(room, path):
     nb_ent_tot = len(entities_pos)
     nb_ent_zoi = len([pos for pos in entities_pos if pos in zone_of_interest])
 
-    density_tot = nb_ent_tot/room.data.size
-    interestingness_score = nb_ent_zoi/len(zone_of_interest)
-    
+    density_tot = nb_ent_tot / room.data.size
+    interestingness_score = nb_ent_zoi / len(zone_of_interest)
+
     return density_tot, interestingness_score

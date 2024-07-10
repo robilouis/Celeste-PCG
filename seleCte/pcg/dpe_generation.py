@@ -26,16 +26,18 @@ def main(args):
     )
 
     d_absolute_counts = {}
-    for perm in itertools.product(ALL_TILES_AND_ENTITIES, repeat=Counter(mdmc_matrix.flatten())[1]):
+    for perm in itertools.product(
+        ALL_TILES_AND_ENTITIES, repeat=Counter(mdmc_matrix.flatten())[1]
+    ):
         d_absolute_counts["".join(perm)] = []
 
     for fn in os.listdir(DATA_PATH):
         if fn[0] in args.dataset:
             df_temp = pd.read_csv(
                 os.path.join(DATA_PATH, fn), header=None, sep=";", dtype=str
-            ).map(lambda x: "0" if x=="" or x==" " else x)
+            ).map(lambda x: "0" if x == "" or x == " " else x)
             lvl_temp = df_temp.to_numpy(dtype=str)
-            
+
             for submatrix in get_all_submatrices(lvl_temp):
                 pattern, tiletype = submatrix_to_count(submatrix, mdmc_matrix)
                 d_absolute_counts[pattern].append(tiletype)
