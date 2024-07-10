@@ -15,7 +15,7 @@ DEFAULT_ROOM_SIZE = [40, 23]
 
 def generate_temp_room(d_exits, d_proba_estimation, btd, rs, origin, status):
     temp_room = celeskeleton.Room(width=rs[0], height=rs[1], status=status)
-    temp_data = utils.generate_room_data(d_proba_estimation, backtracking_depth=btd)
+    temp_data = utils.generate_room_data(d_proba_estimation, rs, backtracking_depth=btd)
     temp_room.set_data(temp_data)
     temp_room.set_origin(origin[0], origin[1])
     temp_room.set_exits(d_exits)

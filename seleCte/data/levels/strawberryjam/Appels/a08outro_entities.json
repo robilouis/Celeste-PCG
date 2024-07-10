@@ -1,1 +1,0 @@
-[{"__name":"jumpThru","id":2133,"x":959,"width":56,"surfaceIndex":-1,"texture":"wood","y":328},{"__name":"player","id":850,"x":48,"y":392},{"__name":"player","id":375,"x":944,"y":328},{"noGhostSprite":true,"requireDashToBreak":true,"__name":"CollabUtils2/MiniHeart","particleColor":"","id":122,"sprite":"expert","x":923,"refillDash":true,"y":280}]

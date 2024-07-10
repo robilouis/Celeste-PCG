@@ -1,1 +1,0 @@
-[{"noGhostSprite":true,"__name":"CollabUtils2/MiniHeart","id":287,"x":160,"sprite":"beginner","y":120},{"__name":"player","id":290,"x":64,"y":152},{"instant":false,"x":0,"inverted":false,"Depth":-13000,"__name":"VivHelper/CustomCoverupWall","height":184,"tiletype":"X","id":588,"y":0,"alpha":1,"width":320,"flag":"SIB_Blackout","RenderPlayerOver":true}]

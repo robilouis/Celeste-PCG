@@ -28,6 +28,26 @@ ALL_TILES_AND_ENTITIES = [
     "L",
 ]
 
+LETHAL_ENTITIES = [
+    "^",
+    "<",
+    "v",
+    ">",
+    "S"
+]
+
+NL_ENTITES = [
+    "D",
+    "C",
+    "_",
+    "O",
+    "Q",
+    "W",
+    "B",
+    "R",
+    "F",
+]
+
 VALID_FG_TILES = [
     "1",
     "3",
@@ -166,6 +186,8 @@ def color_map(val):
         "L": "lightblue",
         "H": "black",
         "0": None,
+        "p": "violet",
+        "e": "plum",
     }
     return "background-color: %s" % color_dict[val]
 
@@ -267,7 +289,7 @@ def update_room_array(array, x, y, d_proba_estimation, bt_depth=0, verbose=True)
 
 
 def generate_room_data(
-    d_proba_estimation, room_size=[40, 23], backtracking_depth=0, verbose=False
+    d_proba_estimation, room_size, backtracking_depth=0, verbose=False
 ):
     width, height = room_size[0], room_size[1]
     room_data = generate_empty_room_data(width, height)
@@ -387,7 +409,7 @@ def astar(maze, start, end, allow_diagonal_movement=True, verbose=False):
             (1, -1),
             (1, 1),
         )
-        direction_cost = (1.0, 1.0, 1.0, 1.0, 1.4, 1.4, 1.4, 1.4)
+        direction_cost = (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
         adjacent_square_pick_index = [0, 1, 2, 3, 4, 5, 6, 7]
     else:
         adjacent_squares = ((0, -1), (0, 1), (-1, 0), (1, 0))
@@ -494,13 +516,51 @@ def astar(maze, start, end, allow_diagonal_movement=True, verbose=False):
     return None
 
 
+## Evaluation time 
+def get_interest_space(array, path, sensibility=5):
+    xmax, ymax = array.shape
+    l_interest_area, potential_neighbors = [], []
+    for x, y in path:
+        potential_neighbors.extend([(x+i, y+j) for i in range(-1*sensibility, sensibility+1) for j in range(-1*sensibility, sensibility+1)])
+    for x_pot, y_pot in potential_neighbors:
+        if x_pot >= 0 and x_pot < xmax and y_pot >= 0 and y_pot < ymax:
+            l_interest_area.append((x_pot, y_pot))
+    return l_interest_area
+
+
+def extract_entity_coords(room, symbol):
+    return [(x, y) for x, y in zip(np.where(room.data == symbol)[0], np.where(room.data == symbol)[1])]
+
+
 def evaluate_astar_path(room, path):  # TODO
+    """
+    Avg. distance to tiles + NL entities
+    """
     raise NotImplementedError
 
 
-def evaluate_room_complexity(room):
+def evaluate_room_difficulty(room, path):
+    """
+    Density of lethal entities + holes + emptiness
+    """
     raise NotImplementedError
 
 
-def evaluate_room_interestingness(room):
-    raise NotImplementedError
+def evaluate_room_interestingness(room, path):
+    """
+    Density of tiles + non-lethal entities
+    """
+    zone_of_interest = get_interest_space(room.data, path)
+    entities_pos = []
+    entities_of_interest = NL_ENTITES + ["1"]
+
+    for ent in entities_of_interest:
+        entities_pos.extend(extract_entity_coords(room, ent))
+
+    nb_ent_tot = len(entities_pos)
+    nb_ent_zoi = len([pos for pos in entities_pos if pos in zone_of_interest])
+
+    density_tot = nb_ent_tot/room.data.size
+    interestingness_score = nb_ent_zoi/len(zone_of_interest)
+    
+    return density_tot, interestingness_score
