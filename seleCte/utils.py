@@ -528,6 +528,17 @@ def get_interest_space(array, path, sensibility=5):
     return l_interest_area
 
 
+def visualize_room_path(room, sensibility):
+    path = room.is_playable_room(return_path=True)
+    room_data_path = get_interest_space(room.data, path, sensibility)
+    df_visu = pd.DataFrame(room.data)
+    for tile_ in room_data_path:
+        df_visu.loc[tile_] = "e"
+    for tile in path:
+        df_visu.loc[tile] = "p"
+    return visualize_room(df_visu)
+
+
 def extract_entity_coords(room, symbol):
     return [
         (x, y)
