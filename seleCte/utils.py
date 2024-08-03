@@ -511,7 +511,7 @@ def astar(maze, start, end, allow_diagonal_movement=True, verbose=False):
 
 
 ## Evaluation time
-def get_interest_space(array, path, sensibility=5):
+def get_interest_space(array, path, sensibility):
     xmax, ymax = array.shape
     l_interest_area, potential_neighbors = [], []
     for x, y in path:
@@ -548,35 +548,76 @@ def extract_entity_coords(room, symbol):
     ]
 
 
-def evaluate_astar_path(room, path):  # TODO
-    """
-    Avg. distance to tiles + NL entities
-    """
-    raise NotImplementedError
-
-
-def evaluate_room_difficulty(room, path):
-    """
-    Density of lethal entities + holes + emptiness
-    """
-    raise NotImplementedError
-
-
-def evaluate_room_interestingness(room, path):
-    """
-    Density of tiles + non-lethal entities
-    """
-    zone_of_interest = get_interest_space(room.data, path)
+def extract_non_lethal_entities_position(room):
     entities_pos = []
     entities_of_interest = NL_ENTITES + ["1"]
 
     for ent in entities_of_interest:
         entities_pos.extend(extract_entity_coords(room, ent))
+    
+    return entities_pos
 
-    nb_ent_tot = len(entities_pos)
-    nb_ent_zoi = len([pos for pos in entities_pos if pos in zone_of_interest])
 
-    density_tot = nb_ent_tot / room.data.size
-    interestingness_score = nb_ent_zoi / len(zone_of_interest)
+def hole_presence(room, pos):
+    """
+    Return True if there is a hole below the current position
+    """
+    return not ("1" or "_" or "D" in room.data[pos[0]:, pos[1]])
 
-    return density_tot, interestingness_score
+
+def hole_density_normalized(room, path):
+    """
+    Return the density of holes within a path found by A*, normalized
+    """
+    l_holes = [hole_presence(room, pos) for pos in path]
+    return sum(l_holes)/len(l_holes)
+
+
+def evaluate_room_difficulty(room, path, sensibility, w_holes=0.5, w_density=0.5):
+    """
+    Density of lethal entities + holes + emptiness
+    Half-half contribution atm, can be weighted differently
+    NB: density_diff + density_nle = 1
+    """
+    holes_diff = hole_density_normalized(room, path)
+    # LE + void density: basically all that is not NLE
+    zone_of_interest = get_interest_space(room.data, path, sensibility)
+    entities_pos = extract_non_lethal_entities_position(room)
+
+    nb_diff_tot = room.data.size - len(entities_pos)
+    nb_diff_zoi = len(zone_of_interest) - len([pos for pos in entities_pos if pos in zone_of_interest])
+
+    density_diff = nb_diff_tot / room.data.size
+    local_density_diff = nb_diff_zoi / len(zone_of_interest)
+
+    difficulty_score = w_holes * holes_diff + w_density * local_density_diff
+
+    return holes_diff, density_diff, local_density_diff, difficulty_score
+
+
+def evaluate_room_interestingness(room, path, sensibility):
+    """
+    Density of tiles + non-lethal entities
+    Return the density of tiles + NLE in the whole room then
+    the same quantity computed in the ZOI, noted as d_tot and 
+    s_int.
+    0 < d_nle < 1: 0 - empty room besides LE; 1 - room full
+    0 < s_int < 1: same but in ZOI
+    """
+    zone_of_interest = get_interest_space(room.data, path, sensibility)
+    entities_pos = extract_non_lethal_entities_position(room)
+
+    nb_nle_tot = len(entities_pos)
+    nb_nle_zoi = len([pos for pos in entities_pos if pos in zone_of_interest])
+
+    density_nle = nb_nle_tot / room.data.size
+    interestingness_score = nb_nle_zoi / len(zone_of_interest)
+
+    return density_nle, interestingness_score
+
+
+def evaluate_astar_path(room, path):  # TODO
+    """
+    Avg. distance to tiles + NL entities
+    """
+    raise NotImplementedError
