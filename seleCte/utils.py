@@ -549,13 +549,13 @@ def extract_entity_coords(room, symbol):
 
 
 def extract_non_lethal_entities_position(room):
-    entities_pos = []
-    entities_of_interest = NL_ENTITES + ["1"]
+    nle_pos = []
+    l_nle = NL_ENTITES + ["1"]
 
-    for ent in entities_of_interest:
-        entities_pos.extend(extract_entity_coords(room, ent))
+    for ent in l_nle:
+        nle_pos.extend(extract_entity_coords(room, ent))
     
-    return entities_pos
+    return nle_pos
 
 
 def hole_presence(room, pos):
@@ -614,6 +614,40 @@ def evaluate_room_interestingness(room, path, sensibility):
     interestingness_score = nb_nle_zoi / len(zone_of_interest)
 
     return density_nle, interestingness_score
+
+
+def get_coords_around_pos(room, pos, dist):
+    def is_valid_coordinate(array, x, y):
+        max_x = len(array)
+        max_y = len(array[0]) if max_x > 0 else 0
+        return 0 <= x < max_x and 0 <= y < max_y
+    
+    x, y = pos
+    list_pos = []
+    for side in (-1, 1):
+        list_pos.extend(
+            [(x + side*dist, y + k) for k in range(-1*dist, dist+1)]
+        )
+        list_pos.extend(
+            [(x + k, y + side*dist) for k in range(-1*dist+1, dist)]
+        )
+    
+    return [(a, b) for (a, b) in list_pos if is_valid_coordinate(room.data, a, b)]
+
+
+def get_min_dist_to_nle(room, pos):
+    l_nle = NL_ENTITES + ["1"]
+    dist = 1
+    if room.data[pos] in l_nle:
+        return 0
+    while dist < max(room.data.shape):
+        l_pos_to_check = get_coords_around_pos(room, pos, dist)
+        for pot_pos in l_pos_to_check:
+            if room.data[pot_pos] in l_nle:
+                return dist
+        dist += 1
+    # if not found: room has not a single NLE: not playable anyways
+    raise ValueError("The room currently investigated has not a single NLE!")
 
 
 def evaluate_astar_path(room, path):  # TODO
