@@ -650,8 +650,12 @@ def get_min_dist_to_nle(room, pos):
     raise ValueError("The room currently investigated has not a single NLE!")
 
 
-def evaluate_astar_path(room, path):  # TODO
+def evaluate_astar_path(room, path):
     """
     Avg. distance to tiles + NL entities
     """
-    raise NotImplementedError
+    l_dist_path_to_nle = []
+    for path_pos in path:
+        l_dist_path_to_nle.append(get_min_dist_to_nle(room, path_pos))
+    
+    return sum(l_dist_path_to_nle)/len(l_dist_path_to_nle)
