@@ -1,5 +1,9 @@
 # seleCte Changelog
 
+# [0.4.0] 05.08.2024
+
+* Implementation of all evaluation functions and helpers in `utils.py`
+
 # [0.3.0] 06.04.2024
 
 * Implementation of A-star like algo and integration in the PCG generation for the sake of playability
