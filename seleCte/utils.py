@@ -5,6 +5,8 @@ import random
 import numpy as np
 import pandas as pd
 
+import seleCte.celeskeleton.celeskeleton as celeskeleton
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -238,15 +240,17 @@ def generate_new_tile(proba_dist, all_symbols=ALL_TILES_AND_ENTITIES, exclude=[]
 
 
 def update_room_array(array, x, y, d_proba_estimation, bt_depth=0, verbose=True):
-    bt_depth_true = bt_depth_true = min(bt_depth, array.shape[1] - y - 3)
+    bt_depth_true = min(bt_depth, array.shape[1] - y - 3)
     # if bt depth > 0, needs to apply backtracking
     # everytime you pick a symbol, add it to excluded - if cannot pick: random pick
     if bt_depth_true:
         excluded_symbols = {i: [] for i in range(bt_depth_true)}
         k = 0
+        n_iter_btd = 0
         array_temp = array.copy()
 
-        while k >= 0 and k < bt_depth_true:
+        while k >= 0 and k < bt_depth_true and n_iter_btd < 100:
+            n_iter_btd += 1
             try:
                 pb_dist = extract_proba_from_tile(
                     array_temp, x, y + k, d_pe=d_proba_estimation
@@ -265,6 +269,9 @@ def update_room_array(array, x, y, d_proba_estimation, bt_depth=0, verbose=True)
             ):  # no tiles left for level k - need to try something else at k-1
                 k -= 1  # backtracking
 
+        if n_iter_btd == 100:  # btd got stuck in a back and forth loop
+            logger.warning("Backtracking stuck in loop! Random generation.")
+            array[x + 2, y + 2] = generate_new_tile({})
         if k == -1:  # no matter the tile used in base lvl it fails => random gen
             logger.warning("Backtracking failed! Random generation.")
             array[x + 2, y + 2] = generate_new_tile({})
@@ -328,6 +335,17 @@ def generate_room_batch(
         )
 
 
+def generate_temp_room(d_exits, d_proba_estimation, btd, rs, origin, status):
+    temp_room = celeskeleton.Room(width=rs[0], height=rs[1], status=status)
+    temp_data = generate_room_data(d_proba_estimation, rs, backtracking_depth=btd)
+    temp_room.set_data(temp_data)
+    temp_room.set_origin(origin[0], origin[1])
+    temp_room.set_exits(d_exits)
+    temp_room.create_exits_in_matrix()
+    temp_room.add_respawn_points()
+    return temp_room
+
+
 # Helper functions for playability module
 class Node:
     """
@@ -338,9 +356,9 @@ class Node:
         self.parent = parent
         self.position = position
 
-        self.g = 0
-        self.h = 0
-        self.f = 0
+        self.g = 0  # Cost from start to node
+        self.h = 0  # Heuristic cost from node to end
+        self.f = 0  # Total cost (g + h)
 
     def __eq__(self, other):
         return self.position == other.position
@@ -366,7 +384,7 @@ def return_path(current_node):
     return path[::-1]  # Return reversed path
 
 
-def astar(maze, start, end, allow_diagonal_movement=True, verbose=False):
+def astar(room, maze, start, end, allow_diagonal_movement=True, verbose=False, stop_condition=0):
     """
     Returns - if exists - a list of tuples as a path from the given start to the given end in the given maze
     """
@@ -389,7 +407,10 @@ def astar(maze, start, end, allow_diagonal_movement=True, verbose=False):
 
     # Adding a stop condition
     outer_iterations = 0
-    max_iterations = len(maze[0]) * len(maze)
+    if stop_condition == 0:
+        max_iterations = len(maze[0]) * len(maze)
+    else:
+        max_iterations = stop_condition
 
     # what squares do we search
     if allow_diagonal_movement:
@@ -403,7 +424,7 @@ def astar(maze, start, end, allow_diagonal_movement=True, verbose=False):
             (1, -1),
             (1, 1),
         )
-        direction_cost = (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        direction_cost = (100.0, 100.0, 10.0, 0.0, 2000.0, 2000.0, 10.0, 10.0)
         adjacent_square_pick_index = [0, 1, 2, 3, 4, 5, 6, 7]
     else:
         adjacent_squares = ((0, -1), (0, 1), (-1, 0), (1, 0))
@@ -528,8 +549,10 @@ def get_interest_space(array, path, sensibility):
     return l_interest_area
 
 
-def visualize_room_path(room, sensibility):
-    path = room.is_playable_room(return_path=True)
+def visualize_room_path(room, sensibility, max_iter=0):
+    path = room.is_playable_room(return_path=True, max_iter=max_iter)
+    if type(path) == bool:
+        return "No path has been found for this room."
     room_data_path = get_interest_space(room.data, path, sensibility)
     df_visu = pd.DataFrame(room.data)
     for tile_ in room_data_path:

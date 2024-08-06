@@ -2,8 +2,6 @@ import argparse
 import json
 import logging
 
-import pandas as pd
-
 import seleCte.celeskeleton.celeskeleton as celeskeleton
 import seleCte.utils as utils
 
@@ -11,17 +9,6 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 DEFAULT_ROOM_SIZE = [40, 23]
-
-
-def generate_temp_room(d_exits, d_proba_estimation, btd, rs, origin, status):
-    temp_room = celeskeleton.Room(width=rs[0], height=rs[1], status=status)
-    temp_data = utils.generate_room_data(d_proba_estimation, rs, backtracking_depth=btd)
-    temp_room.set_data(temp_data)
-    temp_room.set_origin(origin[0], origin[1])
-    temp_room.set_exits(d_exits)
-    temp_room.create_exits_in_matrix()
-    temp_room.add_respawn_points()
-    return temp_room
 
 
 def main(args):
@@ -93,7 +80,7 @@ def main(args):
                 # First add the special point if start or end - if it does not work within limit, re-gen room
                 sp_point_added = False
                 while not sp_point_added:
-                    temp_room = generate_temp_room(
+                    temp_room = utils.generate_temp_room(
                         d_exits_current_room,
                         d_proba_estimation,
                         btd,

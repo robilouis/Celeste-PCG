@@ -276,7 +276,7 @@ class Room:
 
     def extract_astar_ready_data(self):
         rdy_data = pd.DataFrame(self.data)
-        rdy_data = rdy_data.map(lambda x: "0" if x in ["L", "D", "P"] else x)
+        rdy_data = rdy_data.map(lambda x: "0" if x in ["D", "L", "P", "W"] else x)
         rdy_data = rdy_data.map(lambda x: "1" if x != "0" else x)
         rdy_data = rdy_data.to_numpy(dtype=int)
         return rdy_data
@@ -307,7 +307,7 @@ class Room:
                     self.data, a, b, side=exit, origin=self.get_origin()
                 )
 
-    def is_playable_room(self, return_path=False, verbose=False):
+    def is_playable_room(self, return_path=False, verbose=False, max_iter=0):
         # Preprocessing the room data
         room_astar_ready = self.extract_astar_ready_data()
 
@@ -319,7 +319,7 @@ class Room:
             for k in range(nb_exits - 1):
                 # use transitivity
                 pt1, pt2 = room_exits_points[k], room_exits_points[k + 1]
-                room_path = utils.astar(room_astar_ready, pt1, pt2)
+                room_path = utils.astar(self, room_astar_ready, pt1, pt2, stop_condition=max_iter)
                 if not room_path:
                     if verbose:
                         logger.warning("A* room playability failed in current room")
@@ -330,7 +330,7 @@ class Room:
             return room_path
         return True
 
-    def is_valid_special(self, sp, return_path=False, verbose=False):
+    def is_valid_special(self, sp, return_path=False, verbose=False, max_iter=0):
         """
         Assert whether a special point (starting/ending) is valid,
         ie. is connected to all room exits
@@ -338,7 +338,7 @@ class Room:
         room_astar_ready = self.extract_astar_ready_data()
         room_exits_points = self.get_starting_ending_points()
         for pt in room_exits_points:
-            sp_to_exits = utils.astar(room_astar_ready, sp, pt)
+            sp_to_exits = utils.astar(self, room_astar_ready, sp, pt, stop_condition=max_iter)
             if not sp_to_exits:
                 if verbose:
                     logger.warning("Special point cannot reach all room exits")
