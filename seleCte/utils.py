@@ -4,6 +4,8 @@ import os
 import random
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 import seleCte.celeskeleton.celeskeleton as celeskeleton
 
@@ -415,16 +417,16 @@ def astar(room, maze, start, end, allow_diagonal_movement=True, verbose=False, s
     # what squares do we search
     if allow_diagonal_movement:
         adjacent_squares = (
-            (0, -1),
-            (0, 1),
-            (-1, 0),
-            (1, 0),
-            (-1, -1),
-            (-1, 1),
-            (1, -1),
-            (1, 1),
+            (0, -1),   # left
+            (0, 1),    # right
+            (-1, 0),   # up
+            (1, 0),    # down
+            (-1, -1),  # up-left
+            (-1, 1),   # up-right
+            (1, -1),   # down-left
+            (1, 1),    # down-right
         )
-        direction_cost = (100.0, 100.0, 10.0, 0.0, 2000.0, 2000.0, 10.0, 10.0)
+        direction_cost = (2, 2, 1, 0, 10, 10, 1, 1)
         adjacent_square_pick_index = [0, 1, 2, 3, 4, 5, 6, 7]
     else:
         adjacent_squares = ((0, -1), (0, 1), (-1, 0), (1, 0))
@@ -503,10 +505,12 @@ def astar(room, maze, start, end, allow_diagonal_movement=True, verbose=False, s
                 continue
 
             # Create the f, g, and h values
-            child.g = current_node.g + direction_cost_factor
-            child.h = ((child.position[0] - end_node.position[0]) ** 2) + (
+            # x, y = child.position
+            # local_path = [(x, k) for k in range(y-3, y+4) if 0 <= k < len(maze[0])]
+            child.g = current_node.g + (direction_cost_factor + get_min_dist_to_nle(room, child.position)) * max(len(maze[0]), len(maze))
+            child.h = int(np.sqrt((child.position[0] - end_node.position[0]) ** 2) + (
                 (child.position[1] - end_node.position[1]) ** 2
-            )
+            ))
             child.f = child.g + child.h
 
             # Child is already in the open list
@@ -532,6 +536,44 @@ def astar(room, maze, start, end, allow_diagonal_movement=True, verbose=False, s
 
 
 ## Evaluation time
+def create_paths_heatmap(room, nb_paths, c_map="viridis", max_iter=0):
+    l_path = [room.is_playable_room(True, max_iter=max_iter) for _ in range(nb_paths)]
+
+    heatmap_data = np.zeros(room.data.shape, dtype=int)
+    for pos in [
+                    (x, y)
+                    for x, y in zip(
+                        np.where(room.data != "0")[0], np.where(room.data != "0")[1]
+                    )
+                ]:
+        heatmap_data[pos] = -1
+
+    for path in l_path:
+        if type(path) != bool:
+            for path_pos in path:
+                heatmap_data[path_pos] += 1
+
+    df = pd.DataFrame(heatmap_data)
+
+    max_value = df.max().max()
+    min_value = 0
+    norm = plt.Normalize(min_value, max_value)
+    cmap = plt.get_cmap(c_map)
+
+    # Step 3: Function to apply the color scale
+    def color_scale(val):
+        if val == -1:
+            color = (0.6, 0.6, 0.6, 1.)
+        elif val == 0:
+            color = (0.1, 0.1, 0.1, 1.)
+        else:
+            color = cmap(norm(val))
+        return 'background-color: {}'.format(mcolors.rgb2hex(color))
+
+    # Step 4: Apply the color scale to the DataFrame
+    return df.style.map(color_scale)
+
+
 def get_interest_space(array, path, sensibility):
     xmax, ymax = array.shape
     l_interest_area, potential_neighbors = [], []
@@ -585,7 +627,8 @@ def hole_presence(room, pos):
     """
     Return True if there is a hole below the current position
     """
-    return not ("1" or "_" or "D" in room.data[pos[0]:, pos[1]])
+    pot_hole = room.data[pos[0]:, pos[1]]
+    return not ("1" in pot_hole or "_" in pot_hole or "D" in pot_hole)
 
 
 def hole_density_normalized(room, path):
@@ -655,7 +698,7 @@ def get_coords_around_pos(room, pos, dist):
             [(x + k, y + side*dist) for k in range(-1*dist+1, dist)]
         )
     
-    return [(a, b) for (a, b) in list_pos if is_valid_coordinate(room.data, a, b)]
+    return [(a, b) for (a, b) in list_pos if is_valid_coordinate(room.data, a, b) and a >= x]
 
 
 def get_min_dist_to_nle(room, pos):

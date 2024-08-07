@@ -2,6 +2,9 @@ import argparse
 import itertools
 import json
 import os
+import sys
+
+sys.path.append("..")
 
 import numpy as np
 import pandas as pd
@@ -10,12 +13,11 @@ from collections import Counter
 
 from seleCte.utils import (
     ALL_TILES_AND_ENTITIES,
-    MDMC_MATRICES,
     submatrix_to_count,
     get_all_submatrices,
 )
 
-DATA_PATH = "./seleCte/pcg/preprocessing/data_pcg_ready/all_rooms/"
+DATA_PATH = "./pcg/preprocessing/data_pcg_ready/all_rooms/"
 
 
 def main(args):
@@ -61,7 +63,7 @@ def main(args):
             if symbol not in d_proba_estimation[pattern].keys():
                 d_proba_estimation[pattern][symbol] = 0.0
 
-    fn_result_dpe = f"./seleCte/pcg/preprocessing/probability_estimation_dicts/{args.dataset}_{args.mdmc_matrix}.json"
+    fn_result_dpe = f"./pcg/preprocessing/probability_estimation_dicts/{args.dataset}_{args.mdmc_matrix}.json"
     with open(fn_result_dpe, "w") as file:
         json.dump(d_proba_estimation, file, indent=4)
 

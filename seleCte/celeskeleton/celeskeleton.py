@@ -415,6 +415,35 @@ class Room:
         else:
             raise ValueError("Status should be either None, 'start' or 'end'!")
         return True
+    
+    def save(self, path_to_save):
+        """
+        Exports all data contained in the skeleton in a readable JSON
+        """
+
+        json_room = {
+            "origin": self.origin,
+            "size": self.size,
+            "exits": self.exits,
+            "data": self.data
+        }
+        np.savetxt(
+            f"{path_to_save}.csv",
+            self.data,
+            fmt="%s",
+        )
+
+        with open(
+            f"{path_to_save}.json",
+            "w",
+            encoding="utf-8",
+        ) as f:
+            json.dump(json_room, f, ensure_ascii=False, indent=4)
+            f.close()
+
+        logger.info(
+            f"Saved lvl data in folder {path_to_save}"
+        )
 
 
 class Cskeleton:
