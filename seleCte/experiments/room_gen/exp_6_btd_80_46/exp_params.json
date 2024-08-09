@@ -1,0 +1,35 @@
+{
+    "general_params": {
+        "mdmc_mat": "000011012",
+        "training_set": "2",
+        "sensibility": 2,
+        "nb_rooms": 25,
+        "nb_path": 5
+    },
+    "room_params": {
+        "origin": [
+            0,
+            0
+        ],
+        "size": [
+            80,
+            46
+        ],
+        "exits": {
+            "up": [],
+            "down": [],
+            "left": [
+                [
+                    7,
+                    11
+                ]
+            ],
+            "right": [
+                [
+                    7,
+                    11
+                ]
+            ]
+        }
+    }
+}
