@@ -426,7 +426,7 @@ def astar(room, maze, start, end, allow_diagonal_movement=True, verbose=False, s
             (1, -1),   # down-left
             (1, 1),    # down-right
         )
-        direction_cost = (2, 2, 1, 0, 10, 10, 1, 1)
+        direction_cost = (0.1, 0.1, 0.05, 0, 0.5, 0.5, 0.01, 0.01)
         adjacent_square_pick_index = [0, 1, 2, 3, 4, 5, 6, 7]
     else:
         adjacent_squares = ((0, -1), (0, 1), (-1, 0), (1, 0))
@@ -507,10 +507,10 @@ def astar(room, maze, start, end, allow_diagonal_movement=True, verbose=False, s
             # Create the f, g, and h values
             # x, y = child.position
             # local_path = [(x, k) for k in range(y-3, y+4) if 0 <= k < len(maze[0])]
-            child.g = current_node.g + (direction_cost_factor + get_min_dist_to_nle(room, child.position)) * max(len(maze[0]), len(maze))
-            child.h = int(np.sqrt((child.position[0] - end_node.position[0]) ** 2) + (
+            child.g = current_node.g + (direction_cost_factor + get_min_dist_to_nle(room, child.position)/10) * len(maze[0]) * len(maze)
+            child.h = ((child.position[0] - end_node.position[0]) ** 2) + (
                 (child.position[1] - end_node.position[1]) ** 2
-            ))
+            )
             child.f = child.g + child.h
 
             # Child is already in the open list

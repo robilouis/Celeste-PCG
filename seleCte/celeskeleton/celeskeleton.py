@@ -366,6 +366,7 @@ class Room:
                     np.mean(exit) - self.origin[offsets[side][2]]
                 )
                 self.data[respawn_xy[0], respawn_xy[1]] = "P"
+                self.data[respawn_xy[0]+1, respawn_xy[1]-1: respawn_xy[1]+2] = "D"
                 for i, j in [
                     (a, b)
                     for a in range(-1 * clear_space_size + 1, clear_space_size)
@@ -418,14 +419,13 @@ class Room:
     
     def save(self, path_to_save):
         """
-        Exports all data contained in the skeleton in a readable JSON
+        Exports all data contained in the room
         """
 
         json_room = {
             "origin": self.origin,
             "size": self.size,
             "exits": self.exits,
-            "data": self.data
         }
         np.savetxt(
             f"{path_to_save}.csv",
@@ -444,6 +444,21 @@ class Room:
         logger.info(
             f"Saved lvl data in folder {path_to_save}"
         )
+
+    def save_data(self, path_to_save, verbose=False):
+        """
+        Exports room.data in csv
+        """
+        np.savetxt(
+            f"{path_to_save}.csv",
+            self.data,
+            fmt="%s",
+        )
+        
+        if verbose:
+            logger.info(
+                f"Saved lvl data in folder {path_to_save}"
+            )
 
 
 class Cskeleton:
