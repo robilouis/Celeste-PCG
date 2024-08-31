@@ -427,6 +427,7 @@ def astar(room, maze, start, end, allow_diagonal_movement=True, verbose=False, s
             (1, 1),    # down-right
         )
         direction_cost = (0.1, 0.1, 0.05, 0, 0.5, 0.5, 0.01, 0.01)
+        # direction_cost = (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
         adjacent_square_pick_index = [0, 1, 2, 3, 4, 5, 6, 7]
     else:
         adjacent_squares = ((0, -1), (0, 1), (-1, 0), (1, 0))
@@ -508,6 +509,7 @@ def astar(room, maze, start, end, allow_diagonal_movement=True, verbose=False, s
             # x, y = child.position
             # local_path = [(x, k) for k in range(y-3, y+4) if 0 <= k < len(maze[0])]
             child.g = current_node.g + (direction_cost_factor + get_min_dist_to_nle(room, child.position)/10) * len(maze[0]) * len(maze)
+            # child.g = current_node.g + direction_cost_factor
             child.h = ((child.position[0] - end_node.position[0]) ** 2) + (
                 (child.position[1] - end_node.position[1]) ** 2
             )
@@ -622,6 +624,15 @@ def extract_non_lethal_entities_position(room):
     
     return nle_pos
 
+def extract_non_lethal_entities_position_diff(room):
+    nle_pos = []
+    l_nle = NL_ENTITES + ["0", "1"]
+
+    for ent in l_nle:
+        nle_pos.extend(extract_entity_coords(room, ent))
+    
+    return nle_pos
+
 
 def hole_presence(room, pos):
     """
@@ -630,35 +641,63 @@ def hole_presence(room, pos):
     pot_hole = room.data[pos[0]:, pos[1]]
     return not ("1" in pot_hole or "_" in pot_hole or "D" in pot_hole)
 
+def danger_presence(room, pos):
+    pot_danger = room.data[pos[0]:, pos[1]]
+    for sym in pot_danger:
+        if sym == "0":
+            continue
+        elif sym == "^" or sym == "S":
+            return True
+        else:
+            return False
+    return True
 
-def hole_density_normalized(room, path):
+
+def danger_density_normalized(room, path):
     """
-    Return the density of holes within a path found by A*, normalized
+    Return the density of danger within a path found by A*, normalized
     """
-    l_holes = [hole_presence(room, pos) for pos in path]
-    return sum(l_holes)/len(l_holes)
+    l_danger = [danger_presence(room, pos) for pos in path]
+    return sum(l_danger)/len(l_danger)
 
 
-def evaluate_room_difficulty(room, path, sensibility, w_holes=0.5, w_density=0.5):
+def evaluate_room_difficulty(room, path, sensibility):
     """
     Density of lethal entities + holes + emptiness
     Half-half contribution atm, can be weighted differently
     NB: density_diff + density_nle = 1
     """
-    holes_diff = hole_density_normalized(room, path)
+    holes_diff = danger_density_normalized(room, path)
     # LE + void density: basically all that is not NLE
     zone_of_interest = get_interest_space(room.data, path, sensibility)
-    entities_pos = extract_non_lethal_entities_position(room)
+    entities_pos = extract_non_lethal_entities_position_diff(room)
+    entities_pos_nle = extract_non_lethal_entities_position(room)
 
-    nb_diff_tot = room.data.size - len(entities_pos)
     nb_diff_zoi = len(zone_of_interest) - len([pos for pos in entities_pos if pos in zone_of_interest])
+    nb_nle_zoi = len([pos for pos in entities_pos_nle if pos in zone_of_interest])
 
-    density_diff = nb_diff_tot / room.data.size
     local_density_diff = nb_diff_zoi / len(zone_of_interest)
+    scarcity = len(zone_of_interest) / nb_nle_zoi
 
-    difficulty_score = w_holes * holes_diff + w_density * local_density_diff
+    return holes_diff, local_density_diff, scarcity
 
-    return holes_diff, density_diff, local_density_diff, difficulty_score
+
+def get_entropy_data(data):
+    d_sym = {}
+    entropy = 0
+    N = data.size
+    for l in data:
+        for j in l:
+            if j not in d_sym.keys():
+                d_sym[j] = 1
+            else:
+                d_sym[j] += 1
+
+    for key in d_sym.keys():
+        p = d_sym[key]/N
+        entropy += -p*np.log10(p)
+    
+    return entropy
 
 
 def evaluate_room_interestingness(room, path, sensibility):
@@ -679,7 +718,7 @@ def evaluate_room_interestingness(room, path, sensibility):
     density_nle = nb_nle_tot / room.data.size
     interestingness_score = nb_nle_zoi / len(zone_of_interest)
 
-    return density_nle, interestingness_score
+    return density_nle, interestingness_score, get_entropy_data(room.data)
 
 
 def get_coords_around_pos(room, pos, dist):
@@ -725,3 +764,13 @@ def evaluate_astar_path(room, path):
         l_dist_path_to_nle.append(get_min_dist_to_nle(room, path_pos))
     
     return sum(l_dist_path_to_nle)/len(l_dist_path_to_nle)
+
+def variance_astar_path(room, path):
+    """
+    Avg. distance to tiles + NL entities
+    """
+    l_dist_path_to_nle = []
+    for path_pos in path:
+        l_dist_path_to_nle.append(get_min_dist_to_nle(room, path_pos))
+    
+    return np.var(l_dist_path_to_nle)

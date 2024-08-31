@@ -319,7 +319,7 @@ class Room:
             for k in range(nb_exits - 1):
                 # use transitivity
                 pt1, pt2 = room_exits_points[k], room_exits_points[k + 1]
-                room_path = utils.astar(self, room_astar_ready, pt1, pt2, stop_condition=max_iter)
+                room_path = utils.astar(self, room_astar_ready, pt1, pt2, stop_condition=max_iter, verbose=verbose)
                 if not room_path:
                     if verbose:
                         logger.warning("A* room playability failed in current room")
