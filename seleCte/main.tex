@@ -1,0 +1,392 @@
+\documentclass{article}
+
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[english]{babel}
+
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{parskip}
+\usepackage{url}
+
+% make it a little easier on the eyes
+% DO NOT FORGET TO COMMENT OUT
+\usepackage{xcolor}
+\pagecolor[rgb]{0,0,0} %black
+\color[rgb]{0.8,0.8,0.8} %grey
+
+\newcommand{\Celeste}{\textit{Celeste} }
+\newcommand{\Celnosp}{\textit{Celeste}}
+
+\title{Master Thesis - Procedural Content Generation in Celeste\\ Overview of automated level generation in video games and a quick recap of project advancement}
+\author{Louis ROBINET}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Here is a paper presenting the advancement of my Master Thesis project on procedural level generation and summing up some of the most common techniques used in Video Games Procedural Content Generation. The aim of this report is to introduce my project and presents the main ideas and work achieved so far, as well as present an overview of what already exists in this field and find some inspiration for what could be used for Procedural Content Generation (PCG) in Celeste. We will focus mostly on the Mario AI framework since most video games PCG studies are focused on this game, yet will also present applications to other games. Finally, please note that this report is not an exhaustive description of everything that has been done in VGPCG, but is a global review of the main approaches used so far for automated level generation in video games that could be of use for my project.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+\subsection{\Celeste and context of the project}
+\Celeste is a 2D platformer released in 2018. The concept of this game is quite simple: you have to progress through various well-designed levels to climb successfully Mount Celeste, relying on 4 mechanics only: move, jump, dash and grab. You can combine these mechanics to perform more advanced gameplay (if you $\textit{move}$ vertically while you $\textit{grab}$ a wall, you will end up $\textit{climbing}$ the wall; more advanced combinations can be done but listing them would be time consuming and not really interesting within the scope of the project). Just like other platformers, you might interact with a lot of different entities (fatal, like spikes or monsters, or friendly, like bouncers or dash refills) that are really part of the identity of a level. Even more, some levels can just become unbeatable if you remove the entities. So level conception in \Celeste is not only about the structure/the foreground of a level, but the harmony between structure and entities.
+
+\noindent For the rest of this report, I need to make a vocabulary precision: each \textit{level} is subdivided into \textit{rooms}. Procedural content generation concerns the latter: I first generate rooms procedurally, then I assemble them to make a whole level. I am not generating whole levels at once as I am willing to make use of all the available information and potentially extract low-level structures. Rooms contain \textbf{exits}, while a level has a \textbf{starting point} and an \textbf{ending point}.
+\vspace{0.25cm}
+
+\subsection{Video Games PCG - Level Generation}
+Over the past years, people got interested in level generation in video games, and a few approaches have been considered to that end. A lot of this work concerns the video game $\textit{Super Mario Bros.}$ since a framework has been specially developed for using AI methods within a version of this game. This $\textbf{Mario AI framework}$ has been used in the context of Reinforcement Learning applied to video games, by training an agent to play Mario. But this framework also has been used to develop another part of video games AI, that is level generation. For platform games (such as \Celeste or $\textit{Super Mario Bros}$), levels are usually hand-crafted by developers whose task is to make sure that they are as interesting as challenging (beyond the obvious requirement that a level should be clearable). Level generation-oriented PCG is a field of research where AI is used to try to generate levels that meet both requirements stated before.
+
+\subsection{PCG in \Celeste} \label{section:noAI}
+When it comes to level generation applied to \Celnosp, a natural question that comes to mind is whether we should use a supervised or unsupervised method. While the latter requires to define somehow scores to evaluate the interestingness and difficulty of a room to quantify how good a level is, the former allows generating levels from data (in this case, the multiple levels of the game that already exist) and then the main concern is no longer to define obscure evaluation functions but to develop a model that manages to seize as best as possible what characterizes a good level - id est, the ones that already exist. There are two major difficulties in \Celeste level generation:
+\begin{itemize}
+    \item Unlike Mario, \Celeste levels do not always consist of an entrance on the left and an exit on the right! Some rooms do even have exits on the ground and the ceiling and are meant for more vertical gameplay (cf. figure \ref{fig:gp}). One of our major concerns is that we have to make sure that the rooms that will be generated are clearable; that is, that there is always a way to reach the exit.
+    \item There is no "\Celeste AI framework", meaning that we can not, in the short amount of time allowed to this thesis, count on developing an AI agent that would actually play the game; we need to develop an agent-free model. As far as I know, there is no existing work on an agent that plays \Celeste that could be used in the context of this project.
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}{.5\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{images/celeste_hori.jpg}
+  \caption{Horizontal gameplay}
+  \label{fig:sub1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{images/celeste_vert.jpg}
+  \caption{Vertical gameplay}
+  \label{fig:sub2}
+\end{subfigure}
+\caption{Two rooms of \Celeste with different gameplay}
+\label{fig:gp}
+\end{figure}
+
+\vspace{0.25cm}
+\noindent Existing methods using Machine Learning to that end consist of two elements: a representation of the data structure as well as a training algorithm type. A survey \cite{summer} describes different types of data structures used in PCG via Machine Learning and the five training algorithms under consideration. The workflow that I have developed (cf. section \ref{work}) makes me think that the grid representation, $\textit{id est}$ representing a room as an array/matrix, is the most straightforward and efficient way to work with \Celeste rooms. However, some papers using other representations are very interesting and could be worth spending some effort on replacing arrays with other data structures. In section \ref{sota}, we will present some of these different studies related to level generation and how it could connect to PCG in Celeste.
+
+
+\section{Project progression \label{work}}
+Due to its important and active modding community, a visual map editor \textit{Ahorn} has been developed to help people create their own levels in Celeste. For my project, I adapt some of the Julia code behind this interface to generate rooms and levels through some lines of code, hence making room/level generation automation possible.
+
+\noindent From the code POV, a room consists of many things:
+\begin{itemize}
+    \item a foreground: tiles that make ground/ceiling/walls
+    \item entities: additional items that the player can interact with, can be helpful/neutral/deadly depending on the item
+    \item a background: tiles that are in the background, purely decorative
+    \item extra: a room can have some wind (will alter considerably gameplay) or a specific music track (will not change gameplay but can be chosen accordingly with level difficulty for example)
+\end{itemize}
+
+Knowing this, the project consists in generating foregrounds and sets of  entities that make sense in terms of playability. Those are the requirements for room generation in \Celnosp. I believe that backgrounds and music tracks can be added at a later point and will not be a difficult part of the thesis once a good model for generation will be found. I think background can be generated the same way foreground is and I already have some ideas about music, like choosing music according to the difficulty of a level (epic tracks for epic rooms of course). My focus is definitely on foreground and entities so far, since both elements constitute the core of each room. The integration of additional elements can be discussed later if the project progresses well.
+
+\subsection{Workflow}
+I tried to split this project into tasks to keep a clear idea of what is done at every point of the thesis. Figure \ref{fig:workflow} represents the workflow of the project and the different elements that compose it. In the next paragraphs, I will briefly describe the utility of each element and the work done/to do.
+
+\noindent The upper block of the workflow is the part that generates rooms, while the lower part takes care of assembling these rooms as a whole playable level. 
+
+\begin{figure}[h]
+\centering
+    \includegraphics[width=0.95\linewidth]{images/workflow.png}
+    \caption{Workflow of the project - green: functional, orange: on progress, red: to do}
+    \label{fig:workflow}
+\end{figure}
+
+
+\subsubsection{Import data function}
+First of all, I wanted to check whether I could use existing maps as training data or not. Since the source code of \textit{Ahorn} is designed to encode data into playable rooms, I wanted to use it to decode rooms into data. And that is exactly what the Import Data Function (IDF) does. Given a file of a level, I designed a function that decodes and returns for each room its data: the foreground tiles, the background tiles, entities, and even extra information like its coordinates in the level, but also music, wind, gravity, or the number of dashes (you can have up to 2 dashes in some levels). Actually, I can even extract both foreground and entities of a room in a \textbf{single} matrix since tiles and entities do not overlap, making the use of 2D arrays really convenient for room representation.
+
+\noindent This means that we can constitute a database of existing rooms - not only the 700+ rooms from the game but also any level designed by the community! - that can be used for training a PCG model.
+
+\subsubsection{AI model}
+This is the part that I still need to think of so far. I already tested some methods described in section \ref{sota}, but this part still requires quite some work, ideas, and time. However, the goal of this part is quite clear so far: we want the model to generate foreground tiles and entities (probably as a mixed 2D array) that can then be encoded as a playable room by the next block of the workflow. We can consider the generation of extra data (like background and extra information as described above) as a secondary task since it would just make the generation more complex than it already is. We try to keep it as simple as possible for now.
+
+
+\subsubsection{Julia Room Encoder}
+The Julia Room Encoder is basically the inverse of the IDF: this function encodes all the data mentioned above as a single room that is interpretable by \Celnosp, thus playable. I already performed some tests using both this function and the IDF to generate my own rooms and even levels and was able to play in the rooms/levels generated through coding. This function is a working and central part of the project since it allows the conversion of data into concrete game material.
+
+\subsubsection{Level designer: from rooms to levels \label{ld}}
+
+Another main aspect of the project is the level generation \textit{per se}: what to do with the generated rooms and how to assemble them in a whole level?
+
+\noindent When encoding a room, you need to specify its coordinates to then include this room as a block in a level. These $(x_0, y_0)$ coordinates refer to the left lower corner of a room, and each room has a rectangular shape: to describe a room w.r.t. a level, we need three pieces of information: its coordinates $(x_{room}, y_{room})$, its width $w_{room}$, and its height $h_{room}$. To design a level, we consequently face two requirements:
+\begin{itemize}
+    \item Two rooms are said to be connected if they have juxtaposed exits. That being said, each room in a level needs to be connected to at least one room. If we consider a pathway-like level, we can even be more precise: each room needs to be connected to EXACTLY two other rooms, except for the starting and ending rooms that need to be connected to EXACTLY one other room.
+    \item Rooms CANNOT overlap.
+\end{itemize}
+
+Simply put, a level is a set of tuples $\left(\text{room}, \begin{bmatrix}
+x_{room}\\ 
+y_{room}\\ 
+w_{room}\\ 
+h_{room}
+\end{bmatrix}\right)$ that meets the requirements stated above.
+
+\noindent When I experimented and created my own levels through code, I made the calculations and hand-crafted the coordinates of each room so that they would be well assembled and the resulting level would be hence playable. But of course, we want to automatize this process and that is exactly the task we assign to the \textit{Level Designer} block. As mentioned in Figure \ref{fig:workflow} caption, this part is still in progress: it is not functional yet, but I have a couple of ideas already.
+
+\begin{figure}[h]
+\centering
+    \includegraphics[width=0.95\linewidth]{images/level_ex.png}
+    \caption{Example of a \Celeste level structure: rooms are organized in a pathway from start to end}
+    \label{fig:lvl}
+\end{figure}
+
+\noindent A first solution would be to re-use some part of an existing \Celeste mod, the \textit{Randomizer}. This mod is quite awesome because it allows a player to generate brand new levels from the existing rooms in the game. Without going too much into details, it just assembles rooms from different levels into a single new level. Hence, given a collection of freshly generated rooms by our AI model, this algorithm could arrange a subset of this collection as a whole playable level. The only drawback of this method is that it relies on a classification of the difficulty of the rooms, and yet being very useful (cf. \ref{mdmc}), this classification has been hand-crafted and needs to be automated. 
+
+\noindent I also thought of another way of achieving level design by somehow inverting the workflow. First, we would generate the "skeleton" of a level using PCG methods; this skeleton would be a level made of empty rooms. This way, we take care of the requirements to make a playable level in the first place. Therefore, the only thing we would need is the trained AI model to generate rooms of the right size (room sizes according to skeleton data) and force the placement of exits (coordinates of each exit are provided by skeleton data as well). The generation of skeletons has already been dealt with and is functional, the main remaining issue is the placement of the exits in each generated room and the impact on playability.
+
+\subsection{Remaining work and challenges}
+As mentioned in the previous paragraphs, we still need to work on the PCG model that will generate rooms as we need this part to be functional to also finalize the level designer block.
+
+\noindent My main concern on the PCG model is playability: I need to make SURE a room is clearable given the gameplay of \Celeste. I know that the playable room generation rate might be quite low, but the only thing I need is a reliable way to check the \textit{clearability} of a room: we can then think of generating a set of rooms and keep the playable ones or methods to repair unclearable rooms like what has been done in \cite{repair}: the whole generative architecture was meant to generate then repair levels.
+
+\noindent Finally, I would like to be able to evaluate the extent to which generated levels are challenging and interesting by designing some metrics to that end. I also thought and discussed with Alexandra Blank the possibility to hold a night event centered on video games and well-being, as \Celeste is a game whose story focuses on mental health, and therefore an opportunity to collect some user data to evaluate these criteria on some procedurally generated levels. Alexandra was quite enthusiastic about this idea and mentioned some available funding to support the organization of such an event.
+
+\section{Existing methods \label{sota}}
+After a quick review of around 40 papers, no unsupervised method seemed really promising for such complex level generation (complex in the sense that there is no chance that a random generator consistently creates a playable level for \Celeste - there is a need for structure). Also, it would be a bit of a loss not to exploit all the available data. I decided to focus on methods that would put an emphasis on finding the underlying structures in existing levels which would be the foundations for some brand new AI-generated rooms. The core idea here is that we really need a robust model that can grasp what makes a playable level so that it would be easier to tweak it to explore a bit more the search space of possible levels rather than having a model that is really creative but struggles at making clearable levels. Procedural Content Generation (PCG) encompasses a variety of techniques for creating game content algorithmically, and it has been applied extensively to level design in both 2D and 3D games. This state-of-the-art review is organized by level representation methods, including grid-based, grammar-based, and other hybrid techniques.
+
+\subsection{Grid-Based Representation}
+Grid-based representations involve levels being modeled as a matrix of cells or tiles, where each cell represents a specific type of terrain or object. This approach is commonly used in both 2D platformers.
+
+\subsubsection{Random Generation with Constraints}
+Some games like \textit{Baba Is You} use a combination of handcrafted levels and procedural generation to create puzzles. The procedural aspects involve random generation of puzzle elements within certain constraints to ensure solvability of created levels \cite{baba}. Another great example is the work from \cite{spe}, that employs a random dungeon generation approach with predefined rules and constraints applied to the 2D platformer \textit{Spelunky}. The grid-based levels are generated using Perlin noise and random number generators, ensuring each playthrough offers a unique experience while maintaining playability. This study inspired me the skeleton generation for room assembling (discussed in \ref{mod:skel}).
+
+\subsubsection{Markov Chains based methods \label{mdmc}}
+A good model is a model that can learn what makes a \textit{good} level through patterns detection in existing levels. Markov Chains are useful to model probabilistic transitions between different states and are also used in level generation in 2D video games like Mario Bros. \cite{MC} Levels are then represented as 2D arrays and the probabilities of each tile/entity are computed from a set of existing maps to generate new ones. In another paper from the same authors dealing with Markov models-based level generation \cite{snod}, they applied their models to other games like \textit{Kid Icarus} that present more vertical/mixed gameplay and even tackled the playability issue. That method seems very promising for \Celeste level generation but needs to be handled with care because of our game specificities: because \Celeste has rooms that are meant to be played vertically, mixing up all the levels in the process could harm the performance of the model. The same thing goes for the difficulty; some rooms are way more difficult than others, and it might be really interesting to split the training rooms by difficulty levels or some other parameter, hence creating several well-performing models rather than one that mixes up everything.
+
+\subsubsection{Cellular Automata}
+Cellular Automata have been used to model and generate complex structures in grid-based environments. Due to its low complexity and runtime, the work from \cite{cellular} makes great use of the self-organization characteristics of cellular automata to generate interesting, playable, and efficient 2D maps.
+
+\subsection{Grammar-Based Representation}
+Grammar-based representations utilize formal grammars to generate levels by applying production rules to a starting configuration. This approach allows for the creation of levels with specific structures and constraints.
+
+Initially developed for natural language, generative grammars have been adapted to procedural content generation for video games. Graph grammars are adapted to model dungeon levels, where nodes represent rooms and edges represent connections. Adams \cite{adams} used this approach to generate FPS levels, focusing on topological control but facing limitations due to hard-coded rules. Dormans \cite{dorm} extended this by introducing mission grammars to generate adventure game dungeons, adding gameplay-based control. Van der Linden et al. further refined this in \cite{linden} with gameplay grammars, allowing designers to create generic graph-based dungeon layouts tied to player actions, demonstrated in Dwarf Quest.
+
+\subsection{Metric-centered methods}
+Some studies focused on trying to generate coherent and playable levels using some smart hand-crafted metrics like the ones defined in \textit{A Comparative Evaluation of Procedural Level Generators in the Mario AI Framework} \cite{compMarioAI}, where for example $\textit{leniency}$ is basically illustrating the ratio between platforms and gaps in a Mario level, hence a metric related somehow to the difficulty of a level. While this approach alone is incomplete to generate levels, it can be interesting to couple it with a level generator model to influence some characteristics of the created rooms, as in the very interesting paper \textit{Intentional Computational Level Design} \cite{ICLD}, where metrics are used in order to restrict/influence gameplay of the new levels.
+
+\subsection{Hybrid evolutionary approaches}
+A lot of studies around level generation in Mario used methods based on Generative Adversarial Networks (GAN). Among them, the work discussed in \cite{volz} is one of the most interesting I found, since it is well documented, the experiments are well described and available for reproducibility. This study presents a method for procedurally generating \textit{Super Mario Bros.} levels by combining Generative Adversarial Networks (GANs) with evolutionary algorithms. A GAN is first trained on existing levels to learn their structural patterns, creating a latent space that represents various level features. Evolutionary algorithms are then used to explore this latent space by optimizing latent vectors based on objectives like playability and complexity, effectively evolving new and diverse level designs. This approach successfully generates novel, playable levels that adhere to the game's style, demonstrating the potential of integrating deep learning and evolutionary computation for advanced procedural content generation applied to game design. This work goes even beyond the scope of GANs by showing additional methods to enhance GAN-generated levels. It definitely is a robust method that shows a lot of potential for video games level generation, even though a lot of efforts is required to ensure a decent playability rate and an accurate capture of what really makes a level challenging or enjoyable to play.
+
+\noindent Similarly, one could mention the paper from \cite{EA} using autoencoders and Evolutionary Algorithms applied to level generation in video games. An autoencoder, a type of neural network used for dimensionality reduction, is first trained on existing \textit{Lode Runner} levels to capture and compress their essential features into a lower-dimensional latent space. This latent space is then explored using an evolutionary process similar to what was done in \cite{volz}. This work was definitely interesting because of the similarities between levels and their representations in \textit{Lode Runner} (the game studied in the paper) and \Celnosp.
+
+\noindent If the evolutionary characteristic of the above method lied in the exploration of the latent space of \textit{Super Mario Bros.} levels, some approaches use evolutionary methods as the main component of their PCG model. For example, \cite{GA} explores the use of genetic algorithms to automatically generate levels for 2D platformer games. The method involves representing game levels as sequences of tiles, which can be manipulated through typical genetic operations like mutation and crossover to evolve towards new levels over successive generations. The fitness function, which guides the evolution, evaluates levels based on gameplay-based criteria like playability, difficulty, and diversity. This approach aims to create levels that are both playable and varied, and ultimately demonstrates that genetic algorithms can effectively generate engaging and playable platformer levels, offering a flexible and adaptive method for PCG.
+
+\subsection{Summary of the SOTA and choice for Celeste PCG}
+After reviewing various approaches on PCG applied to game design and more specifically to level generation, it became evident that unsupervised methods are not suitable for generating playable levels in complex games like \Celeste. Instead, methods that leverage existing level structures offer more promise. Of these, Markov chains methods stood out due to their ability to efficiently learn structures from existing levels in grid-based representations, which aligns well with how Celeste levels are structured and handled from a coding perspective. This inspired the choice of a Markov chains-based PCG model for Celeste, as it provides a robust and flexible - yet rather simple - framework for generating structured, and hopefully playable levels.
+
+\section{Research question} \label{RQ}
+I initially started this project with the intent of making it a modding tool usable by the community; that is, players should be ultimately able to use this tool to procedurally generate random, unique, and most importantly, playable levels. Building an entire workflow able to generate a level from a few entry parameters is already a challenge of its own, given that nearly nothing exists to that end besides a Julia repository originally developed for a visual map editor project \cite{maple}. However, the player-oriented aspect is very important to me in this project and I definitely want to push this project a bit further than basic generation. Once the generator workflow is operational, I want to evaluate its performance through several aspects which, to me, are critical when it comes to player experience in a platformer, like the complexity, the interestingness, or most importantly the playability of a level. The evaluation will provide insights into the effectiveness of the tool and its impact on player experience and how the generated levels meet criteria for these aspects, with special care for playability. A level can be incredibly interesting and amusing; at the end of the day, if the game is not clearable, the player leaves with nothing but frustration.
+
+\noindent In this thesis, I aim to develop a comprehensive, configurable procedural content generation pipeline applied to the 2D platformer \Celnosp, while being able to evaluate the produced levels, hence enabling a finer control on the characteristics of the output of this pipeline. I hope this study will eventually contribute to the field by offering a revised tool for level generation and providing foundations for a new AI framework for assessing procedural content applied to \Celnosp.
+
+\section{General idea and setup}
+Due to its important and active modding community, a visual map editor \textit{Ahorn} has been developed to help people create their own levels in \Celnosp. For my project, I adapt some of the Julia code behind this interface (a project named \textit{Maple} \cite{maple}) to generate rooms and levels through some lines of code, making room and level generation automation possible.
+
+\noindent This wrapper code actually allows to read the binary files containing the original levels of the game. I was hence able to notice that a level is nothing more than a set of rooms assembled in space using the right coordinates. All the interesting information and all the details of a level were contained and divided in each of the rooms. A room consists of many things, and we can actually summarize its most important components below (we will ignore what we call \textit{decals} in the room data, which is purely aesthetic and will not be considered for the scope of this project):
+\begin{itemize}
+    \item a foreground: the set of tiles which composes the ground, ceiling, and walls of a room
+    \item the entities: all additional items that the player can interact with, can be helpful, neutral, or even deadly depending on the entity (just like a mushroom or a Goomba if we were to find the equivalent in \textit{Super Mario Bros.})
+    \item a background: the set of decorative tiles that are in the background, only aesthetic, does not interact with the gameplay
+    \item metadata: special settings of a room, like wind (will alter considerably gameplay) or a specific music track (will not change gameplay but can be chosen accordingly with level difficulty for example)
+\end{itemize}
+
+Knowing this, the initial scope of my project consists in generating foregrounds and sets of entities that are well structured and make sense in their interaction when it comes to playability. Those are the base requirements for room generation in \Celnosp. Backgrounds and metadata like custom music tracks can be added at a later point and are not a difficult part of the workflow once a running pipeline is established, but I want to keep it as simplified as possible to introduce the general idea of my solution. As I will discuss in a subsection dedicated to the PCG model below, background can be generated the same way foreground is some ideas about music integration, like choosing music according to the difficulty of a level (epic tracks for epic rooms of course), will be discussed at the very end of the project, when the relevant quantities, naming, and metric are introduced. My focus is definitely on foreground and entities so far, since both elements constitute the core of each room and make it playable, or not. Integration of additional elements will be discussed later at relevant times or in the conclusion as potential further improvements.
+
+\subsection{General idea: model and workflow}
+As stated in the section \ref{sota} dedicated to studies dealing with procedural content generation applied to the generation of levels of video games, we need structure. Structure is even more important in platformers than in other \textit{genres}, where level structure and design is critical at both high- and low-levels as it impacts directly the gameplay experience (TODO: SOURCE??). I chose to implement a model heavily inspired by \cite{MC} and \cite{snod}: the representation of a room as an array whose elements are symbols corresponding to specific tiles or entities makes perfectly sense when considering \Celnosp, and by essence, Multi-dimensional Markov Chains are a powerful mathematical tool which takes structure into account as it will be discussed in the subsection dedicated to the PCG model. But then, another problem soon arises: even though I can generate a plethora of rooms, connecting them is nothing but easy: indeed, the exits of a room are not part of the data or metadata of a level; they are given by the general structure of a level and how the rooms are placed at a high-level. I solved this issue by adopting an approach inspired from \cite{spe}: rather than trying hopelessly to recombine rooms in space, we first generate the high-level layer of a level, its \textit{skeleton}. The generation therefore comes in two parts: 
+\begin{itemize}
+    \item We first generate the high-level layer, the skeleton of a level. This object was specifically created for this project and displays some interesting characteristics: the skeleton of a level consists of a given number of boxes organized in space such that all boxes are connected to at least one other box through "exits" and there is no overlapping at all between any pair of boxes. The skeleton generation process, input parameters and characteristics will be detailed in the subsection \ref{mod:skel} dedicated to the \textit{Celeskeleton} module. To sum it up, the first stage of the level generation pipeline outputs a random, empty level: I have at disposition a set of empty boxes/rooms and their respective exits well-organized in space, such that there exists a high-level path from the starting to the ending room, no matter the input parameters chosen.
+    \item At this point, what is left is to fill the skeleton previously generated: for each room composing the skeleton, I use the Markov chains based model (briefly mentioned above, and detailed in the subsection \ref{mod:pcg}) to generate a set of foreground tiles and entities matching the size of the room to fill. Of course, playability is no longer ensured at a low-level after the filling, but after this two-step generation the output is a set of rooms, filled with foreground tiles and entities, and connected in 2D space through exits without any overlap, which is both necessary and sufficient to be converted into a playable binary file.
+\end{itemize}
+
+\noindent Beyond the generation part of the project, I clearly identified and split this project into steps, into modules, on which I worked separately in order to build a continuous, streamlined, and relatively tunable workflow. I will share a brief overview of the different steps composing the pipeline before diving into each module in details. The first step is to extract the information from the game and create a "database" with all levels from \Celeste as training data to feed the Markov chains based model. A first module is the \textit{Data loader} described in subsection \ref{mod:data}. Then, moving towards the generation; we described the two-part level generation right above. The subsection \ref{mod:skel} is focusing on the procedural generation of the skeleton object freshly introduced, and on the elaboration of two \textit{Python} classes designed to that end: \textit{Room} and \textit{Celeskeleton}. The subsection \ref{mod:pcg} describes precisely the model used to generate the data filling the rooms of a level skeleton. The fourth module described in \ref{mod:play} is deeply interconnected with the model module, as it deals with the post-processing of every single generated room, like adding necessary entities to make the level launchable by the game, or assessing the playability of a generated room in accordance with the exits defined by the skeleton. Finally, when the generation is final - skeleton created, filled, and each room post-processed - we want to convert this output data into a single binary file, such that the game can process this freshly generated data into a level we can play. The \textit{room encoder} described in subsection \ref{mod:julia} is the last module of this project, and serves this purpose.
+ 
+\subsection{Modules}
+\subsubsection{Data loader} \label{mod:data}
+Thanks to the existing \textit{Julia} wrapper, \textit{Maple} \cite{maple}, I was able to extract the data from the level files. I used and adapted some parts of this code originally made to encode data into playable binary files, to decode existing files containing hand-designed levels. I thought it was really interesting to make it a real customizable module instead of a one-time work, as this allows me to consider a dynamic database; \Celeste is a video game which benefits of a very active modding community which designs brand new and original hand-crafted levels frequently. At this point, it is important to understand that, from the game point of view, a level is equivalent to a vector of rooms, and each room is an object made of several attributes like foreground/background tiles, entities, necessary metadata like the room size and origin in the 2D grid of the level. Some additional information can be also extracted, like the music track, the wind force, gravity, number of dashes available, etc.
+
+\noindent Given a level file, I designed a function in \textit{Julia} that decodes and returns for each room the foreground tiles, the background tiles, and the entities. The tiles are simply represented by 2D arrays of symbols stored into \textit{.csv} files and the dictionary of entities is stored into a \textit{.json} file.
+
+\noindent Since there is no overlapping possible between any entity and the foreground, the choice of 2D arrays/matrices is very reasonable for level representation in \Celnosp. Essentially, the representation of a room including background is done using 3D matrices for this project (or equivalently a collection of two matrices of the same size - one for the foreground/entities mix, the other for the background). After the extraction, a second step is therefore to recombine the foreground and the entities within a single matrix. I extended an existing dictionary in \textit{Maple} to map entities from the game to symbols to represent them in the arrays. An entity is so far represented by its name, its origin, and potentially its size (amongst other attributes specific to each entity that I will not present here). In the matrix representation, entities can be 0D - just one tile - when entity size is \textit{None}, 1D for entities whose size has only one component, or 2D for the entities having a non-zero size along both axis. Furthermore, while positions and sizes of the entities are in pixels, \Celeste rooms are measured in tiles, which are simply $8 \times 8$ pixels squares. An entity $i$ can be represented simply by $$(\mathcal{S}_i, {x_0}_i, {y_0}_i, w_i, h_i)$$ where $\mathcal{S}_i$ is the symbol assigned to entity $i$, $({x_0}_i, {y_0}_i)$ is its origin and $(w_i, h_i)$ its width and height. Let $\mathcal{M}$ be the matrix containing the foreground tiles information of a room. For all $$TODO$$
+
+First of all, I wanted to check whether I could use existing maps as training data or not. Since the source code of \textit{Ahorn} is designed to encode data into playable rooms, I wanted to use it to decode rooms into data. 
+And that is exactly what the Import Data Function (IDF) does. Given a file of a level, I designed a function that decodes and returns for each room its data: the foreground tiles, the background tiles, entities, and even extra information like its coordinates in the level, but also music, wind, gravity, or the number of dashes (you can have up to 2 dashes in some levels). Actually, I can even extract both foreground and entities of a room in a \textbf{single} matrix since tiles and entities do not overlap, making the use of 2D arrays really convenient for room representation.
+
+$$TODO: Insert graph for data loader here$$
+
+\noindent This means that we can constitute a database of existing rooms - not only the 700+ rooms from the game but also any level designed by the community - that can be used for training a PCG model. 
+
+\subsubsection{Room \& Celeskeleton} \label{mod:skel}
+As mentioned above when describing the general workflow idea, the level generation is a two-step process, and generating its global structure, its skeleton, is the first important part of it. This skeleton of a level has to obey a certain set of rules and specifications in order to be considered as a potential candidate for future valid levels. Decomposing levels in sub-parts is interesting from a diversity perspective, but soon a major question arises: how to assemble generated rooms in a whole level such that the resulting arrangement makes sense from a game design point of view?
+The Room and Celeskeleton objects are pythonic classes I introduced and designed to address this central point.
+
+\noindent When encoding a level (\textit{id est} converting data into a binary file that can be interpreted by \Celnosp), the coordinates of each room need to be specified so that the game can correctly place the room in a 2D space. Each room is basically a rectangle that can be described by four different attributes:
+\begin{itemize}
+    \item Origin: $(x_{room}, y_{room})$ indicates the position of the bottom-left corner of a room.
+    \item Size: $(w_{room}, h_{room})$ indicates the width and height of a room.
+    \item Data: a 2D-array of size $w_{room} \times h_{room}$ containing symbols representing all the tiles and entities filling the room.
+    \item Exits: a 4-keys dictionary (one per side) indicating the coordinates of the different exits present in the room.
+\end{itemize}
+
+$$TODO add example of room object + visu$$
+
+The first class I designed, the \textit{Room} class, serves this sole purpose of storing all the information related to a room object, but I also extended it to enable some post-processing and playability functionalities discussed in \ref{mod:play}. Overall, this class allows to create, store and modify room objects that will be used for level generation.
+
+\noindent Now concerning the assembling of the rooms: to design a level, I am facing two unavoidable requirements.
+\begin{itemize}
+    \item First, two rooms are said to be \textit{connected} if they have juxtaposed exits. That being said, each room composing a level needs to be connected to \textbf{at least} one room.
+    \item Rooms can \textbf{never} overlap.
+\end{itemize}
+Simply put, a level is a set of \textit{Room} objects meeting the requirements stated above. And that is where the \textit{Celeskeleton} object intervenes. The \textit{Celeskeleton} is a collection of \textit{Room} objects, augmented with information about which rooms are the starting and ending room. When I experimented and created my own levels through code, I made the calculations and hand-crafted the coordinates of each room so that they would be well assembled and the resulting level would hence be playable. But of course, we want to automatize this process and it definitely is the reasoning behind the creation of the \textit{Celeskeleton} class. 
+
+\subsubsection{Markov Chains-based model} \label{mod:pcg}
+As mentioned in the section \ref{sota}, the model I designed for Procedural Content Generation applied to level generation in \Celeste has been inspired from \cite{MC}. Since I needed to build the whole AI framework for \Celeste, I wanted the PCG core model to be simple and flexible. I think this Markov Chains-based approach that I adapted to \Celeste was the best compromise I could find with respect to these constraints I set. I will present in this part all the details related to the model designed for \Celeste PCG.
+
+\paragraph{Multi-dimensional Markov Chains (MdMC)} To completely understand how the procedural generation works in my work, I will start with a short mathematical parenthesis about Markov Chains (MC). A MC is a stochastic process that transitions from one state to another within a finite or countably infinite set of states; for this study, the set of states is the set of possible tiles and entities in the grid representation of \Celeste rooms and is hence finite. The key property of a first-order MC is that the probability of transitioning to the next state depends only on the current state and not on the sequence of events that preceded it. Introducing some mathematical formalism, it gives:
+
+\noindent Let $\mathcal{S} = \left\{S_i\right\}_{i=1}^N$ be a finite set of states, and $P$ be conditional probability distribution such that $P(S_t|S_{t-1})$ represents the probability of transitioning to a state $S_t$ given that the previous state was $S_{t-1}$. These two elements are what a first-order Markov Chain consists of. The Markov property for first-order MC can be translated as: $$P(S_t|S_{t-1},S_{t-2},\ldots,S_{0}) = P(S_t|S_{t-1})$$
+However, higher-order MC are definitely essential to the model I use. Let $r$ be a strictly positive integer. An MC of order $r$ therefore takes into consideration $r$ previous states: $$P(S_t|S_{t-1},S_{t-2},\ldots,S_{0}) = P(S_t|S_{t-1},\ldots,S_{t-r})$$
+To generalize the basic concept of Markov Chains to a 2D-space, let $R = \left\{R_{i,j}\right\}_{(i,j) \in \{1,\ldots,N\}\times\{1,\ldots,M\}}$ be a 2D room of shape $(N,M)$, and $\mathcal{S} = \left\{S_i\right\}_{i=1}^T$ be the set of the possible states, accounting for the $T$ possible types of tiles or entities one can find in \Celeste. For any pair of coordinates $(i,j)$, the tile $R_{i,j}$ is in a given state $S_k$, where $k \in \{1,\ldots,T\}$. Simply put, a room is represented by a 2D-array of given states among all the existing tiles and entities within \Celnosp.
+
+\paragraph{Learning with MdMC} Let's consider a MdMC representing the probability of a tile in a room according to the surrounding tiles. This set of surrounding tiles used for learning probabilities will be called a \textit{configuration} and can be represented using a $3\times3$ configuration matrix $\mathcal{C}$: $$\mathcal{C} =
+\begin{bmatrix}
+    C_{00} & C_{01} & C_{02}\\
+    C_{10} & C_{11} & C_{12}\\
+    C_{20} & C_{21} & 2\\
+\end{bmatrix}$$
+where $C_{22} = 2$ is by default representing a tile $R_{x,y}$ to learn, and for all other $(i,j)$ pairs in $\mathcal{C}$, $C_{ij} = 1$ means that the probability of the tile $R_{x,y}$ depends on the tile $R_{x+i-2,y+j-2}$; else $C_{ij} = 0$. Let's consider an example. The configuration matrix
+$$\mathcal{C}_{000011012} =
+\begin{bmatrix}
+    0 & 0 & 0\\
+    0 & 1 & 1\\
+    0 & 1 & 2\\
+\end{bmatrix}
+$$
+considers the tiles on top, on left, and on top-left of the tile considered. Each configuration will be identified by a unique 9-digits sequence corresponding to the values of its matrix read line-by-line. The example above represents the $000011012$ configuration.
+
+\noindent For the sake of clarity, I will introduce the concept of \textit{adjacent} tiles. For example, we consider the configuration $001001112$ whose matrix is given by:
+$$
+\mathcal{C}_{001001112} =
+\begin{bmatrix}
+    0 & 0 & 1\\
+    0 & 0 & 1\\
+    1 & 1 & 2\\
+\end{bmatrix}
+$$
+and a example $5\times5$ room given by:
+$$
+R =
+\begin{bmatrix}
+    1 & 0 & 0 & 0 & 0\\
+    1 & 0 & 0 & 0 & 0\\
+    1 & 0 & 0 & D & D\\
+    1 & 0 & 0 & D & D\\
+    1 & 1 & 1 & 1 & 1\\
+\end{bmatrix}
+$$
+For a given position $(x,y)$ in the room $R$, the tiles of interest given by $\mathcal{C}_{001001112}$, the \textit{adjacent} tiles, are the two tiles above, and the two tiles on the left of $R_{x,y}$. These adjacent tiles, being read from left to right, then from top to bottom, constitute a n-gram that will prove useful for practical training of this MdMC-based model. Therefore, if we look at $R_{4,5} = D$, the adjacent tiles are represented by the n-gram made of $(R_{2,5}, R_{3,5}, R_{4,3}, R_{4,4}) = 0D0D$. 
+
+\noindent Now for the learning process: let $\mathcal{C}$ be a configuration matrix, and $\mathcal{R}$ a dataset of rooms $R$ that are considered for the training. The MdMC model is learned in two steps:
+\begin{itemize}
+    \item The method begins by counting the occurrences of each tile type w.r.t. the adjacent tiles in the whole training dataset, with adjacent tiles being defined by the configuration matrix $\mathcal{C}$. These counts are called \textit{absolute counts}, and are defined for each tile type $S_i$ by $$N(S_i|S_{i-1},\ldots,S_{i-t})$$ where $t$ represents the number of $1$'s in $\mathcal{C}$.
+    \item Using the absolute counts, \textit{transition probabilities} are calculated. These probabilities represent the likelihood of a tile type following a specific arrangement of adjacent tiles, the tiles considered for this arrangement being once again defined by the chosen configuration $\mathcal{C}$. The transition probability of a tile type $S_i$ is computed as:
+    $$P(S_i|S_{i-1},\ldots,S_{i-t}) = \frac{N(S_i|S_{i-1},\ldots,S_{i-t})}{\sum_j N(S_j|S_{j-1},\ldots,S_{j-t})}$$
+\end{itemize}
+In practice, I coded a function which, for a given configuration and a given training dataset, builds a dictionary whose keys are all the possible n-grams of adjacent tiles encountered in the training set, and whose values are also dictionaries, where this time the key/value pairs are given by all the possible tile types and their associated transition probability computed following the above algorithm. Training a model is therefore equivalent to building this dictionary of probability transitions, and depends of course on the choice of both the configuration and the set of rooms considered for the training.
+
+\noindent Classification of rooms is at least suggested in order to train such a model. I will also experiment and try to figure out if a single model training on the whole set of rooms is efficient enough, but my first intuition is that \Celeste presents by essence a great diversity in terms of level design, and mixing altogether this plethora of well-designed levels would probably result in a sub-optimal pattern extraction and to a confused level generation. A simple example would be that some levels are meant to be more vertical than others (one could think of rooms that have exits on their top and bottom exclusively), and therefore the underlying structures display more verticality as well. When it comes to the gameplay, it can be a tough task for some rooms that present dynamics that are neither totally vertical nor horizontal. We could think of creating a third class to label rooms with mixed gameplay. A simple way to classify rooms is to consider the level to which they belong; as one would except some continuity within a same level, I believe that training a Markov Chains-based model on separate levels could enhance the pattern extraction and consequently make it really good at understanding what composes a good room, at least for every single level. Some extension of this study would be to find some alternative training data splitting, like classifying the rooms depending on their difficulty. To that end, one could think of using the extensive classification made for the \textit{Randomizer} mod introduced earlier. Although it is a subjective classification, it is a good estimate of how hard a room is to clear and could be a good starting point to split existing rooms into several training sets.
+
+\paragraph{Room generation} Once the model has learned a given MdMC for a pair configuration/training dataset, meaning that I have built a dictionary of probability transitions (DPT), I create an room array full of zeros $R$ that I update using an iterative process, starting from the top-left tile $R_{2,2}$ (accounting for the size of the configuration matrix), the following steps are done for every single tile, from left to right, and then top to bottom:
+\begin{itemize}
+    \item I extract the adjacent tiles n-gram
+    \item The corresponding probability distribution in the DPT is 
+    \item The next tile is picked randomly among this probability distribution
+\end{itemize}
+However, a major issue encountered using this process in \cite{MC} was the handling of unseen states, preventing this method from being used in-game as the PCG model would eventually fail. I adapted this process so that the room generation would go through; if the model ever encounters an \textbf{unseen state} (\textit{id est} a n-gram that has not been faced during the training step), I introduced a backtracking possibility: the generation process goes back, and tries generating another tile until the updated n-gram is known. If all the tile types have been tried unsuccessfully, the process goes one more step back until one of the two outcomes is reached:
+\begin{itemize}
+    \item A combination of tiles is finally found such that we no longer face an unseen state, the generation process resumes normally
+    \item There is no possible combination of tiles avoiding an unseen state and we reached the backtracking maximum depth (I set a limit such that room generation does not become indecently time consuming): I solved the unseen state issue by simply setting a random tile type
+\end{itemize}
+One could think that backtracking is therefore useless and that I could simply solve any unseen state issue through random generation; however, experiences confirmed that this would inevitably lead to frequent degeneration as random tile generation often leads to some more unseen states, and an apparently local problem results in a global generation failure. Combination of both random generation and backtracking allows the model to achieve complete room generation while avoiding the generation of random diagonals.
+
+$$TODO figure degeneration$$
+
+\subsubsection{Post-processing and playability} \label{mod:play}
+After generating rooms for Celeste using a Markov Chain-based method, a crucial step involves post-processing the generated layouts to ensure that they are not only structurally coherent but also playable. This post-processing stage focuses on refining the generated rooms by creating accessible exits and adding mandatory gameplay elements like respawn points, which significantly enhance the playability rate of the rooms.
+
+\paragraph{Creating Accessible Exits} Given that the coordinates of the exits are predetermined during skeleton generation, the first post-processing step involves ensuring these exits are unobstructed and functional. This is achieved by clearing an small area around each exit, setting the corresponding tiles to $0$ (air/empty space). By doing this, I guarantee that the player can seamlessly transition from one room to another \textbf{locally}, without encountering any obstacles that would render the exit inaccessible. Ensuring clear exits is critical for maintaining the flow of the game, as obstructed exits can lead to frustration and disrupt players experience. However, this is definitely not a guarantee of global playability, this measure should rather be seen as a safeguard that does not necessarily alter the global room structure as level design common sense tends to leave the exits rather clear and unobstructed. Still, since the PCG model has no reason to have any knowledge related to exits structure, it is a post-processing measure that proves itself quite necessary; otherwise, most of the generated rooms are simply unclearable just because the exits are obstructed.
+
+\paragraph{Adding Respawn Points} To ensure a room is readable by the game, it is mandatory to place respawn points, represented by the symbol $P$. These points are strategically placed within each room near the exits. Beyond their mandatory aspect because of \Celeste game desgin, respawn points are also essential for player progression, as they define locations where the player will respawn after dying, reducing the potential for frustration by minimizing the distance the player must travel after a failure if the player loses at the very end of a room by accident. In addition to respawn points, small platforms made of dream blocks, represented by the symbol $D$, are placed below each respawn point. Dream blocks serve as temporary platforms that allow the player to regain control and plan their next move after respawning. Dream blocks have also very convenient gameplay properties in \Celeste, like the ability of being dashed through at no cost, making it a structure that is particularly safe and permitting. The inclusion of these elements ensures that the room is not only playable but also fair and engaging, as it provides players with a fallback structure and reduces the likelihood of them being stuck in difficult or unfair scenarios, or worse: stuck in a deathloop.
+
+\noindent 
+
+
+\subsubsection{Room encoder} \label{mod:julia}
+The Room Encoder module serves as the critical counterpart to the data loader module presented in \ref{mod:data}. While the data loader decodes existing rooms into data matrices that are used for training, the Room Encoder performs the reverse operation: it encodes generated level data into a format that is interpretable and playable within \Celeste. Essentially, this function takes the output from the level generation process—including every single room generated but also the metadata contained in the level skeleton mentioned in \ref{mod:skel}, necessary for the spatial arrangement of rooms—and converts it into a binary file compatible with \Celeste's engine.
+
+\noindent The encoding process involves multiple components. First, the room's primary data, which includes the layout of foreground tiles, entities, and any interactive elements, is translated into a structured format. This ensures that the generated room maintains the gameplay mechanics and environmental interactions expected in \Celeste. Additionally, the Room Encoder manages the metadata associated with each room through the encoding of the level skeleton. This includes the room's origin within the level, its dimensions, the placement and functionality of exits, ensuring that rooms are arranged and connected within the overall level, thus enabling seamless navigation from one room to another. Moreover, other less critical gameplay parameters like wind conditions, gravity, and music settings could be integrated here, leaving the door open to a more complete level generation.
+
+\noindent The functionality of the Room Encoder has been validated through testing, where rooms and even entire levels generated via coding were successfully encoded and played in Celeste. This capability makes the Room Encoder module a central and indispensable component of the project, as it bridges the gap between abstract data and concrete, playable game content. Without it, the transition from a procedurally generated level design to an actual gaming experience would not be possible, underscoring its importance in the conception of an end-to-end workflow.
+
+\subsection{From CLI to playable binary files} \label{CLI}
+
+\section{Evaluation of generated rooms}
+
+Generating rooms and levels is, of course, the main objective of this project, and that is what I achieved through the pipeline I built and described in the previous section. However, to create a truly effective PCG system, especially for a game like \Celnosp, having robust evaluation tools is essential. Even simple metrics or scores enable valuable feedback that can be used to fine-tune the various control parameters throughout the generation process. Evaluation is not just about model optimization; it’s a crucial step for refining the output product and gaining a deeper understanding of how different parameters influence the results.
+
+At this stage of the project, I can generate levels from a simple command line as presented in the subsection \ref{CLI}, but I only have a rough idea of how each control parameter affects the final output, let alone how to set them to create great, playable rooms. Thinking even ahead of this project, I built this pipeline leaving enough room for flexibility, especially when it comes to room generation. I believe that the PCG model I designed for this thesis is definitely far from being optimal, and I am convinced that other hybrid approaches mentioned in \ref{sota}, while being more complicated to implement and adapt to \Celnosp, would produced more elaborated and coherent levels. My choice, as explained earlier, has definitely been highly motivated by the implementation subjective simplicity-I still had to write around 2000 lines of code for this project-and this part also aims to finding the limitations of such a "simple" PCG model.
+
+But first things first: what makes a room 'great'? And what does it even really mean for a room to be 'playable'? To address these questions, I’m introducing three key metrics that I want to evaluate for every room generated: \textit{playability}, \textit{interestingness}, and \textit{difficulty}. These metrics will guide the fine-tuning process and help determining to what extent generated rooms are not only functional but also engaging and appropriately challenging for players. In the following subsections, I will describe more precisely each one of these metrics and properly define them using some mathematical formalism, why and how I think they matter for the player experience, and I will present experiments set up to evaluate the current PCG model performance with respect to these three key aspects.
+
+\subsection{Playability}
+\subsubsection{Justification \& Definition}
+When introducing the research question in section \ref{RQ}, I emphasized the importance of playability in my project; many papers dealing with PCG applied to level generation in platformers present only a low playability rate in the generated levels - it has nothing to do with the quality of their generators, the approach is just completely different. As my project was initially thought of as a mod usable by the \Celeste community, I initially wanted to achieve a decent playability rate to keep the generating time rather low. I still stand by this idea and the whole architecture of my generator has been heavily influenced because of this choice.
+
+\subsubsection{Experiments}
+
+\subsubsection{Results \& Discussion}
+
+
+\subsection{Interestingness}
+\subsubsection{Justification \& Definition}
+\subsubsection{Experiments}
+\subsubsection{Results \& Discussion}
+
+\subsection{Difficulty}
+\subsubsection{Justification \& Definition}
+\subsubsection{Experiments}
+\subsubsection{Results \& Discussion}
+
+
+\subsection{Experimental setup}
+As described in the previous subsections \ref{score:start} to \ref{score:end}, some characteristics are easy to quantify and ultimately absolute. However, most of them are more complex to evaluate: while their definition is rather clear and unanimous, the associated score used to quantify them can be very different. For such metrics, I need to evaluate the quality of the score designed. As mentioned in section \ref{section:noAI}, I do not have an AI agent capable of playing \Celeste and provide us with valuable feedback concerning potential difficulty or good or bad level design. Therefore my idea was to collect user input to evaluate generated levels and their associated hand-crafted scores. The concept of the experiment is described below.
+
+\noindent For the generation time and the playability, one can proceed with an automated evaluation, user input is not needed. I hence generate levels using different parameter sets among the ones presented earlier. The idea is to quantify the impact of the different parameters on these metrics, and confirm some intuitions. I will evaluate generation time and playability against room size, number of rooms, backtracking depth, and proximity matrix used.
+
+\noindent For the other scores, user input is definitely required. A panel of players will play a selection of the levels that were issued from my generator, and will answer afterward a short questionnaire. For this part, I do not want to assert the playability nor the generation time, but rather solely focus on the three other quantities of interest. To that end, the set of levels presented to the testers was enforced to be playable by discarding and re-generating (until success) any unplayable room created during the skeleton filling process in the PCG pipeline, based on the playability metric defined. In addition to the playability assessment for every single room generated, I added the computation of scores, which allows the generation of levels with rooms whose scores are kept within predefined ranges. I therefore generated levels with several ranges of complexity and interestingness, enabling the comparison with the player experience and rating. The questionnaire the players are asked to fill is trying to quantify, from their point of view, their own perception of complexity and interestingness of the generated rooms, and could be a great starting point for refactoring the model and/or introducing some parameters to have more control on those quantities as a next step for this project to make this generator complete, tunable, and for the players, beyond the scope of this thesis.
+
+
+\section{Conclusions \& Discussion}
+
+In this report, I introduced the project I am working on for my thesis and its progress so far. The high priority now is on the development of a satisfying AI model for room generation since room assembling heavily relies on this part. I am currently testing several methods amongst the ones described in \ref{sota} to come up with an original method that works (the aim of this project is not just reproducing someone else's work, of course, I want my solution to be as original and efficient as possible).
+
+\noindent In the meantime, I am currently trying to develop a method to determine the playability of a room. I already have some ideas, like using distances (a simple approach is to measure the reach of a jump-dash combination in several directions, hence finding a lower bound of maximum distance allowed between platforms).
+
+\bibliographystyle{apalike}
+\bibliography{sample}
+
+\end{document}
