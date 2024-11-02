@@ -1,5 +1,11 @@
 # seleCte Changelog
 
+# [0.5.0] 26.10.2024
+
+* Major cleanup:
+    - Remove sandbox notebooks
+    - Remove generated images for POC
+
 # [0.4.0] 05.08.2024
 
 * Implementation of all evaluation functions and helpers in `utils.py`
