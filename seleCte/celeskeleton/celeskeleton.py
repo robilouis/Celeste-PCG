@@ -319,7 +319,14 @@ class Room:
             for k in range(nb_exits - 1):
                 # use transitivity
                 pt1, pt2 = room_exits_points[k], room_exits_points[k + 1]
-                room_path = utils.astar(self, room_astar_ready, pt1, pt2, stop_condition=max_iter, verbose=verbose)
+                room_path = utils.astar(
+                    self,
+                    room_astar_ready,
+                    pt1,
+                    pt2,
+                    stop_condition=max_iter,
+                    verbose=verbose,
+                )
                 if not room_path:
                     if verbose:
                         logger.warning("A* room playability failed in current room")
@@ -338,7 +345,9 @@ class Room:
         room_astar_ready = self.extract_astar_ready_data()
         room_exits_points = self.get_starting_ending_points()
         for pt in room_exits_points:
-            sp_to_exits = utils.astar(self, room_astar_ready, sp, pt, stop_condition=max_iter)
+            sp_to_exits = utils.astar(
+                self, room_astar_ready, sp, pt, stop_condition=max_iter
+            )
             if not sp_to_exits:
                 if verbose:
                     logger.warning("Special point cannot reach all room exits")
@@ -366,7 +375,9 @@ class Room:
                     np.mean(exit) - self.origin[offsets[side][2]]
                 )
                 self.data[respawn_xy[0], respawn_xy[1]] = "P"
-                self.data[respawn_xy[0]+1, respawn_xy[1]-1: respawn_xy[1]+2] = "D"
+                self.data[respawn_xy[0] + 1, respawn_xy[1] - 1 : respawn_xy[1] + 2] = (
+                    "D"
+                )
                 for i, j in [
                     (a, b)
                     for a in range(-1 * clear_space_size + 1, clear_space_size)
@@ -416,7 +427,7 @@ class Room:
         else:
             raise ValueError("Status should be either None, 'start' or 'end'!")
         return True
-    
+
     def save(self, path_to_save):
         """
         Exports all data contained in the room
@@ -441,9 +452,7 @@ class Room:
             json.dump(json_room, f, ensure_ascii=False, indent=4)
             f.close()
 
-        logger.info(
-            f"Saved lvl data in folder {path_to_save}"
-        )
+        logger.info(f"Saved lvl data in folder {path_to_save}")
 
     def save_data(self, path_to_save, verbose=False):
         """
@@ -454,11 +463,9 @@ class Room:
             self.data,
             fmt="%s",
         )
-        
+
         if verbose:
-            logger.info(
-                f"Saved lvl data in folder {path_to_save}"
-            )
+            logger.info(f"Saved lvl data in folder {path_to_save}")
 
 
 class Cskeleton:

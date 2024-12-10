@@ -386,7 +386,15 @@ def return_path(current_node):
     return path[::-1]  # Return reversed path
 
 
-def astar(room, maze, start, end, allow_diagonal_movement=True, verbose=False, stop_condition=0):
+def astar(
+    room,
+    maze,
+    start,
+    end,
+    allow_diagonal_movement=True,
+    verbose=False,
+    stop_condition=0,
+):
     """
     Returns - if exists - a list of tuples as a path from the given start to the given end in the given maze
     """
@@ -417,14 +425,14 @@ def astar(room, maze, start, end, allow_diagonal_movement=True, verbose=False, s
     # what squares do we search
     if allow_diagonal_movement:
         adjacent_squares = (
-            (0, -1),   # left
-            (0, 1),    # right
-            (-1, 0),   # up
-            (1, 0),    # down
+            (0, -1),  # left
+            (0, 1),  # right
+            (-1, 0),  # up
+            (1, 0),  # down
             (-1, -1),  # up-left
-            (-1, 1),   # up-right
-            (1, -1),   # down-left
-            (1, 1),    # down-right
+            (-1, 1),  # up-right
+            (1, -1),  # down-left
+            (1, 1),  # down-right
         )
         direction_cost = (0.1, 0.1, 0.05, 0, 0.5, 0.5, 0.01, 0.01)
         # direction_cost = (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
@@ -508,7 +516,9 @@ def astar(room, maze, start, end, allow_diagonal_movement=True, verbose=False, s
             # Create the f, g, and h values
             # x, y = child.position
             # local_path = [(x, k) for k in range(y-3, y+4) if 0 <= k < len(maze[0])]
-            child.g = current_node.g + (direction_cost_factor + get_min_dist_to_nle(room, child.position)/10) * len(maze[0]) * len(maze)
+            child.g = current_node.g + (
+                direction_cost_factor + get_min_dist_to_nle(room, child.position) / 10
+            ) * len(maze[0]) * len(maze)
             # child.g = current_node.g + direction_cost_factor
             child.h = ((child.position[0] - end_node.position[0]) ** 2) + (
                 (child.position[1] - end_node.position[1]) ** 2
@@ -543,11 +553,9 @@ def create_paths_heatmap(room, nb_paths, c_map="viridis", max_iter=0):
 
     heatmap_data = np.zeros(room.data.shape, dtype=int)
     for pos in [
-                    (x, y)
-                    for x, y in zip(
-                        np.where(room.data != "0")[0], np.where(room.data != "0")[1]
-                    )
-                ]:
+        (x, y)
+        for x, y in zip(np.where(room.data != "0")[0], np.where(room.data != "0")[1])
+    ]:
         heatmap_data[pos] = -1
 
     for path in l_path:
@@ -565,12 +573,12 @@ def create_paths_heatmap(room, nb_paths, c_map="viridis", max_iter=0):
     # Step 3: Function to apply the color scale
     def color_scale(val):
         if val == -1:
-            color = (0.6, 0.6, 0.6, 1.)
+            color = (0.6, 0.6, 0.6, 1.0)
         elif val == 0:
-            color = (0.1, 0.1, 0.1, 1.)
+            color = (0.1, 0.1, 0.1, 1.0)
         else:
             color = cmap(norm(val))
-        return 'background-color: {}'.format(mcolors.rgb2hex(color))
+        return f"background-color: {mcolors.rgb2hex(color)}"
 
     # Step 4: Apply the color scale to the DataFrame
     return df.style.map(color_scale)
@@ -621,8 +629,9 @@ def extract_non_lethal_entities_position(room):
 
     for ent in l_nle:
         nle_pos.extend(extract_entity_coords(room, ent))
-    
+
     return nle_pos
+
 
 def extract_non_lethal_entities_position_diff(room):
     nle_pos = []
@@ -630,7 +639,7 @@ def extract_non_lethal_entities_position_diff(room):
 
     for ent in l_nle:
         nle_pos.extend(extract_entity_coords(room, ent))
-    
+
     return nle_pos
 
 
@@ -638,11 +647,12 @@ def hole_presence(room, pos):
     """
     Return True if there is a hole below the current position
     """
-    pot_hole = room.data[pos[0]:, pos[1]]
+    pot_hole = room.data[pos[0] :, pos[1]]
     return not ("1" in pot_hole or "_" in pot_hole or "D" in pot_hole)
 
+
 def danger_presence(room, pos):
-    pot_danger = room.data[pos[0]:, pos[1]]
+    pot_danger = room.data[pos[0] :, pos[1]]
     for sym in pot_danger:
         if sym == "0":
             continue
@@ -658,7 +668,7 @@ def danger_density_normalized(room, path):
     Return the density of danger within a path found by A*, normalized
     """
     l_danger = [danger_presence(room, pos) for pos in path]
-    return sum(l_danger)/len(l_danger)
+    return sum(l_danger) / len(l_danger)
 
 
 def evaluate_room_difficulty(room, path, sensibility):
@@ -673,7 +683,9 @@ def evaluate_room_difficulty(room, path, sensibility):
     entities_pos = extract_non_lethal_entities_position_diff(room)
     entities_pos_nle = extract_non_lethal_entities_position(room)
 
-    nb_diff_zoi = len(zone_of_interest) - len([pos for pos in entities_pos if pos in zone_of_interest])
+    nb_diff_zoi = len(zone_of_interest) - len(
+        [pos for pos in entities_pos if pos in zone_of_interest]
+    )
     nb_nle_zoi = len([pos for pos in entities_pos_nle if pos in zone_of_interest])
 
     local_density_diff = nb_diff_zoi / len(zone_of_interest)
@@ -694,9 +706,9 @@ def get_entropy_data(data):
                 d_sym[j] += 1
 
     for key in d_sym.keys():
-        p = d_sym[key]/N
-        entropy += -p*np.log10(p)
-    
+        p = d_sym[key] / N
+        entropy += -p * np.log10(p)
+
     return entropy
 
 
@@ -704,7 +716,7 @@ def evaluate_room_interestingness(room, path, sensibility):
     """
     Density of tiles + non-lethal entities
     Return the density of tiles + NLE in the whole room then
-    the same quantity computed in the ZOI, noted as d_tot and 
+    the same quantity computed in the ZOI, noted as d_tot and
     s_int.
     0 < d_nle < 1: 0 - empty room besides LE; 1 - room full
     0 < s_int < 1: same but in ZOI
@@ -726,18 +738,16 @@ def get_coords_around_pos(room, pos, dist):
         max_x = len(array)
         max_y = len(array[0]) if max_x > 0 else 0
         return 0 <= x < max_x and 0 <= y < max_y
-    
+
     x, y = pos
     list_pos = []
     for side in (-1, 1):
-        list_pos.extend(
-            [(x + side*dist, y + k) for k in range(-1*dist, dist+1)]
-        )
-        list_pos.extend(
-            [(x + k, y + side*dist) for k in range(-1*dist+1, dist)]
-        )
-    
-    return [(a, b) for (a, b) in list_pos if is_valid_coordinate(room.data, a, b) and a >= x]
+        list_pos.extend([(x + side * dist, y + k) for k in range(-1 * dist, dist + 1)])
+        list_pos.extend([(x + k, y + side * dist) for k in range(-1 * dist + 1, dist)])
+
+    return [
+        (a, b) for (a, b) in list_pos if is_valid_coordinate(room.data, a, b) and a >= x
+    ]
 
 
 def get_min_dist_to_nle(room, pos):
@@ -762,8 +772,9 @@ def evaluate_astar_path(room, path):
     l_dist_path_to_nle = []
     for path_pos in path:
         l_dist_path_to_nle.append(get_min_dist_to_nle(room, path_pos))
-    
-    return sum(l_dist_path_to_nle)/len(l_dist_path_to_nle)
+
+    return sum(l_dist_path_to_nle) / len(l_dist_path_to_nle)
+
 
 def variance_astar_path(room, path):
     """
@@ -772,5 +783,5 @@ def variance_astar_path(room, path):
     l_dist_path_to_nle = []
     for path_pos in path:
         l_dist_path_to_nle.append(get_min_dist_to_nle(room, path_pos))
-    
+
     return np.var(l_dist_path_to_nle)
