@@ -32,7 +32,7 @@ Model generating content procedurally to create rooms
 
 #### Misc
 Script for formatting: `bash -c 'pyupgrade --py311-plus $(find **/*.py) && black . && ruff . --fix '`
-Install updated versions of Maple: `Pkg.add(PackageSpec(url="https://github.com/robilouis/Maple.git"))`
+Install updated versions of Maple: `Pkg.add(PackageSpec(url="https://github.com/<your-github-username>/Maple.git"))`
 
 
 # TODOs:

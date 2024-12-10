@@ -1,5 +1,9 @@
 # seleCte Changelog
 
+# [0.5.0] 10.12.2024
+
+* Refactor the whole repo to make it public - remove tests, local exp., etc.
+
 # [0.4.0] 05.08.2024
 
 * Implementation of all evaluation functions and helpers in `utils.py`
