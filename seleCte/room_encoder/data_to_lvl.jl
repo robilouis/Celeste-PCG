@@ -4,7 +4,7 @@ using DelimitedFiles
 using JSON
 using Pkg
 
-Pkg.add(PackageSpec(url="https://github.com/robilouis/Maple.git"))
+Pkg.add(PackageSpec(url="https://github.com/CelestialCartographers/Maple.git"))  # change this if you forked Maple to make some modifications
 
 using Maple
 

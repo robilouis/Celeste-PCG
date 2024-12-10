@@ -2,7 +2,6 @@ import bokeh
 import bokeh.plotting
 from bokeh.io import export_png
 from bokeh.models import ColumnDataSource
-import itertools
 import json
 import logging
 import os
