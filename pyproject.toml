@@ -1,10 +1,17 @@
 [project]
 name = "Celeste-PCG"
-version = "0.1.1"
-description = "Celeste Master Thesis by robilouis"
+version = "0.5.0"
+description = "Procedural Content Generation pipeline applied to Celeste level generation by robilouis - a Master Thesis project"
 requires-python = ">= 3.11"
 authors = [
     {name = "Louis Robinet", email = "louisrobi@hotmail.fr"},
 ]
 readme = "README.md"
 license = {file = "LICENSE"}
+dependencies = [
+    "ipykernel>=6.29.5",
+    "matplotlib>=3.9.2",
+    "numba>=0.60.0",
+    "numpy>=2.0.2",
+    "seaborn>=0.13.2",
+]
